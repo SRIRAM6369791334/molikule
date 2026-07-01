@@ -46,11 +46,26 @@ function renderProductGrid(products, wrapper) {
             {
                 name: "Product",
                 formatter: (cell, row) => {
-                    const img = row.cells[2].data || '/assets/images/placeholder.png';
+                    const img = row.cells[2].data || '';
                     const category = row.cells[3].data;
+                    const id = row.cells[6].data;
+                    
+                    const hasImage = img && !img.includes('img-1.png') && !img.includes('placeholder.png');
+                    
+                    let imageHtml = '';
+                    if (hasImage) {
+                        imageHtml = `<img src="${img}" alt="" class="rounded me-3" style="width: 45px; height: 45px; object-fit: cover; border: 1px solid #eee;">`;
+                    } else {
+                        imageHtml = `
+                            <a href="/products/${id}/edit" class="btn btn-sm btn-soft-success me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; padding: 0; font-size: 10px; line-height: 1.1; text-align: center; font-weight: 600; border: 1px dashed #28a745;">
+                                <span>Add<br>Image</span>
+                            </a>
+                        `;
+                    }
+                    
                     return gridjs.html(`
                         <div class="d-flex align-items-center">
-                            <img src="${img}" alt="" class="rounded me-3" style="width: 45px; height: 45px; object-fit: cover; border: 1px solid #eee;">
+                            ${imageHtml}
                             <div style="line-height: 1.2;">
                                 <h6 class="text-truncate mb-1" style="max-width: 180px; font-weight: 600;">${cell}</h6>
                                 <span class="badge bg-soft-info text-info small" style="font-size: 10px;">${category}</span>
