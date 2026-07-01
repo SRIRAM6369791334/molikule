@@ -259,7 +259,7 @@
                                     <select class="form-select form-select-lg select2" id="variant_unit" name="variant_unit"
                                         required onchange="buildVariantName()">
                                         <option value="">Select Size</option>
-                                        @foreach(['50ml', '100ml', '200ml', '250ml', '500ml', '1L', '2L', '5L'] as $size)
+                                        @foreach(['50ml', '100ml', '200ml', '250ml', '500ml', '1L', '2L', '3L', '4L', '5L', '10L', '20L'] as $size)
                                             <option value="{{ $size }}">{{ $size }}</option>
                                         @endforeach
                                     </select>

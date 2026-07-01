@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 3. GridJS Implementation (100% Sync with Kumarimall UI)
     const mapVariantToRow = (v) => [
-        v.main_image || 'https://placehold.co/100x100?text=Variant',
+        { image: v.variant_image, id: v.id },
         gridjs.html(`<div class="fw-bold text-primary">${v.variant_name || `${v.value} ${v.variant_unit || ''}`}</div><small class="text-muted">SKU: ${v.sku || 'N/A'}</small>`),
         gridjs.html(`<div class="fw-semibold">${v.product ? v.product.name : 'Unknown'}</div>`),
         v.product && v.product.brand ? v.product.brand.brand_name : 'N/A',
@@ -107,8 +107,19 @@ document.addEventListener('DOMContentLoaded', function () {
             columns: [
                 {
                     name: "Image",
-                    width: "80px",
-                    formatter: (cell) => gridjs.html(`<img src="${cell}" class="rounded shadow-sm" style="width:45px; height:45px; object-fit:cover; border: 1px solid #eee;">`)
+                    width: "90px",
+                    formatter: (cell) => {
+                        const hasImage = cell.image && cell.image !== '';
+                        if (hasImage) {
+                            return gridjs.html(`<img src="${cell.image}" class="rounded shadow-sm" style="width:45px; height:45px; object-fit:cover; border: 1px solid #eee;">`);
+                        } else {
+                            return gridjs.html(`
+                                <a href="/product-variants/${cell.id}/edit" class="btn btn-sm btn-soft-success d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; padding: 0; font-size: 10px; line-height: 1.1; text-align: center; font-weight: 600; border: 1px dashed #28a745;">
+                                    <span>Add<br>Image</span>
+                                </a>
+                            `);
+                        }
+                    }
                 },
                 { name: "Variant Details", width: "200px" },
                 { name: "Product", width: "180px" },

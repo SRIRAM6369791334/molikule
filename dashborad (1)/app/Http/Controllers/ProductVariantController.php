@@ -704,7 +704,15 @@ class ProductVariantController extends Controller
                 }
 
                 $variantValue = $getVal(['variant_value', 'variant_va', 'variant_val']) ?? '';
-                $variantUnit = $getVal(['variant_unit', 'variant_un']) ?? '';
+                $variantUnitRaw = $getVal(['variant_unit', 'variant_un']) ?? '';
+
+                // Normalize casing of unit (e.g. 500ML -> 500ml, 5l -> 5L) to match dropdown values
+                $variantUnit = $variantUnitRaw;
+                if (preg_match('/^(\d+)\s*(ml|ML)$/i', $variantUnitRaw, $matches)) {
+                    $variantUnit = $matches[1] . 'ml';
+                } elseif (preg_match('/^(\d+)\s*(l|L)$/i', $variantUnitRaw, $matches)) {
+                    $variantUnit = $matches[1] . 'L';
+                }
                 $variantMrpVal = $getVal(['variant_mrp', 'variant_mr']) ?? '0';
                 $variantStockVal = $getVal(['variant_stock', 'variant_st']) ?? '0';
 
