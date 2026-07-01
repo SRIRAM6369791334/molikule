@@ -672,7 +672,9 @@ class ProductController extends Controller
             \Log::error('Image storage failed', ['error' => $e->getMessage()]);
             return null;
         }
-     public function downloadTemplate()
+    }
+
+    public function downloadTemplate()
     {
         $headers = [
             'Content-Type' => 'text/csv',
