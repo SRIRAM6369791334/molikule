@@ -617,4 +617,170 @@ class ProductVariantController extends Controller
         $path = $file->store($directory, 'uploads');
         return $path;
     }
+
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="variants_template.csv"',
+        ];
+
+        $callback = function() {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, [
+                'product_id', 'variant_value', 'variant_unit', 'variant_mrp', 'variant_stock', 'variant_sku'
+            ]);
+            fputcsv($file, [
+                '1', 'Wox Polish Scent', '5L', '2400.00', '50', 'A-WX-01'
+            ]);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function bulkUpload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:5120',
+        ]);
+
+        $file = $request->file('file');
+        $fileHandle = fopen($file->getRealPath(), 'r');
+        $header = fgetcsv($fileHandle); // Get headers
+
+        // Clean headers (remove whitespace/BOM/lowercasing)
+        $header = array_map(function($h) {
+            return strtolower(trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h)));
+        }, $header);
+
+        $inserted = 0;
+        $updated = 0;
+        $skipped = 0;
+
+        DB::beginTransaction();
+        try {
+            while (($row = fgetcsv($fileHandle)) !== false) {
+                // Check if row matches header count
+                if (count($row) !== count($header)) {
+                    $skipped++;
+                    continue;
+                }
+
+                $data = array_combine($header, $row);
+                
+                // Helper to find value by matching keys (exact or prefix match)
+                $getVal = function($possibleKeys) use ($data) {
+                    foreach ($possibleKeys as $key) {
+                        if (isset($data[$key])) {
+                            return trim($data[$key]);
+                        }
+                        // Prefix/partial matching
+                        foreach ($data as $k => $v) {
+                            if (str_starts_with($k, $key) || str_starts_with($key, $k)) {
+                                return trim($v);
+                            }
+                        }
+                    }
+                    return null;
+                };
+
+                $productIdVal = $getVal(['product_id', 'product_i']);
+                $productId = $productIdVal !== null ? (int)$productIdVal : null;
+                
+                $variantSku = $getVal(['variant_sku', 'sku']) ?? '';
+
+                if (empty($productId) || empty($variantSku)) {
+                    $skipped++;
+                    continue;
+                }
+
+                // Verify product exists
+                $product = Product::find($productId);
+                if (!$product) {
+                    $skipped++;
+                    continue;
+                }
+
+                $variantValue = $getVal(['variant_value', 'variant_va', 'variant_val']) ?? '';
+                $variantUnit = $getVal(['variant_unit', 'variant_un']) ?? '';
+                $variantMrpVal = $getVal(['variant_mrp', 'variant_mr']) ?? '0';
+                $variantStockVal = $getVal(['variant_stock', 'variant_st']) ?? '0';
+
+                $variantMrp = (float)$variantMrpVal;
+                $variantStock = (int)$variantStockVal;
+
+                $variantName = ($variantValue && $variantUnit) ? ($variantValue . ' – ' . $variantUnit) : ($variantValue ?: ($variantUnit ?: 'Standard'));
+
+                // Create or Update Product Variant
+                $variant = ProductVariant::updateOrCreate(
+                    ['sku' => $variantSku],
+                    [
+                        'product_id' => $productId,
+                        'variant_name' => $variantName,
+                        'variant_type' => 'flavour_volume',
+                        'value' => $variantValue,
+                        'variant_unit' => $variantUnit,
+                        'mrp_price' => $variantMrp,
+                        'stock_quantity' => $variantStock,
+                        'active' => true,
+                    ]
+                );
+
+                // Update product main price and stock to keep in sync
+                $minPrice = ProductVariant::where('product_id', $productId)->min('mrp_price') ?? $variantMrp;
+                $totalStock = ProductVariant::where('product_id', $productId)->sum('stock_quantity') ?? $variantStock;
+                
+                $product->update([
+                    'mrp_price' => $minPrice,
+                    'stock_quantity' => $totalStock,
+                ]);
+
+                // Create audit snapshot (ProductRecord) if possible
+                try {
+                    $category = $product->category;
+                    $brand = $product->brand;
+                    $variants = $product->variants()->get();
+                    \App\Models\ProductRecord::updateOrCreate(
+                        ['sku' => $variantSku],
+                        [
+                            'product_name'      => $product->name,
+                            'category_name'     => $category->category_name ?? 'N/A',
+                            'brand_name'        => $brand->brand_name ?? 'N/A',
+                            'product_full_data'  => $product->toArray(),
+                            'category_full_data' => $category ? $category->toArray() : [],
+                            'brand_full_data'    => $brand ? $brand->toArray() : [],
+                            'variants_full_data' => $variants->toArray(),
+                        ]
+                    );
+                } catch (\Exception $ex) {
+                    // Ignore audit failures
+                }
+
+                if ($variant->wasRecentlyCreated) {
+                    $inserted++;
+                } else {
+                    $updated++;
+                }
+            }
+
+            fclose($fileHandle);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk upload complete. Created: $inserted, Updated: $updated, Skipped: $skipped",
+                'variants' => ProductVariant::with(['product.category', 'product.brand'])->latest()->take(100)->get()
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            fclose($fileHandle);
+            \Log::error('Variant Bulk Upload Failed', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Variant Bulk Upload Failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

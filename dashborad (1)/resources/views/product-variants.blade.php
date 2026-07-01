@@ -82,7 +82,7 @@
                     </div>
                     <form id="productverfilterForm" novalidate>
                         <div class="row align-items-end g-3">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Choose Brand</label>
                                 <select class="form-select" name="brand_id" id="sel_brand_select">
                                     <option value="" selected>All Brands</option>
@@ -91,7 +91,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Choose Category</label>
                                 <select class="form-select" name="category_id" id="sel_category_select">
                                     <option value="" selected>All Categories</option>
@@ -109,8 +109,13 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <button type="submit" class="btn btn-success w-100 productver_filter_btn">Filter</button>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#bulkUploadVariantsModal">
+                                    <i class="mdi mdi-upload me-1"></i> Bulk Upload
+                                </button>
                             </div>
                             <div class="col-md-2">
                                 <a href="{{ route('product-variants.create') }}" class="btn btn-primary w-100">
@@ -395,6 +400,39 @@
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Upload Variants Modal -->
+    <div class="modal fade" id="bulkUploadVariantsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bulk Upload Variants</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="bulkUploadVariantsForm" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label">Upload CSV File</label>
+                            <input type="file" class="form-control" name="file" accept=".csv" required>
+                        </div>
+                        <div class="alert alert-info py-2 small mb-3">
+                            <strong>Note:</strong> Variant images will be set to optional during import. You can edit them manually later.
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ route('product-variants.download-template') }}" class="btn btn-link text-decoration-none p-0 small">
+                                <i class="mdi mdi-download"></i> Download Sample CSV Template
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary bulk_submit_btn">Start Upload</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

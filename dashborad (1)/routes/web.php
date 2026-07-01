@@ -104,6 +104,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('product-variants/edit/{product_variant}', [ProductVariantController::class, 'ajaxEdit'])->name('product-variants.ajax-edit');
     Route::post('product-variants/destroy/{product_variant}', [ProductVariantController::class, 'ajaxDestroy'])->name('product-variants.ajax-destroy');
 
+    Route::get('product-variants/download-template', [ProductVariantController::class, 'downloadTemplate'])->name('product-variants.download-template');
+    Route::post('product-variants/bulk-upload', [ProductVariantController::class, 'bulkUpload'])->name('product-variants.bulk-upload');
     Route::get('product-variants/bulk-create', [ProductVariantController::class, 'bulkCreate'])->name('product-variants.bulk-create');
     Route::post('product-variants/bulk-store', [ProductVariantController::class, 'bulkStore'])->name('product-variants.bulk-store');
     Route::resource('product-variants', ProductVariantController::class)->parameters(['product-variant' => 'product_variant']);

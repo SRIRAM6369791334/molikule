@@ -29,6 +29,7 @@ function renderProductGrid(products, wrapper) {
         gridNewProduct.updateConfig({
             data: products.map((p, index) => [
                 index + 1,
+                p.product_id,
                 p.name,
                 p.image_url || p.image || '',
                 p.category ? p.category.category_name : 'No Category',
@@ -43,12 +44,13 @@ function renderProductGrid(products, wrapper) {
     gridNewProduct = new gridjs.Grid({
         columns: [
             "S.NO",
+            "Product ID",
             {
                 name: "Product",
                 formatter: (cell, row) => {
-                    const img = row.cells[2].data || '';
-                    const category = row.cells[3].data;
-                    const id = row.cells[6].data;
+                    const img = row.cells[3].data || '';
+                    const category = row.cells[4].data;
+                    const id = row.cells[7].data;
                     
                     const hasImage = img && !img.includes('img-1.png') && !img.includes('placeholder.png');
                     
@@ -92,7 +94,7 @@ function renderProductGrid(products, wrapper) {
                 name: "Action",
                 sort: false,
                 formatter: (_, row) => {
-                    const id = row.cells[6].data;
+                    const id = row.cells[7].data;
                     return gridjs.html(`
                         <div class="d-flex gap-2">
                             <a href="/products/${id}/edit" class="btn btn-sm btn-soft-primary px-3">
@@ -112,6 +114,7 @@ function renderProductGrid(products, wrapper) {
         search: true,
         data: products.map((p, index) => [
             index + 1,
+            p.product_id,
             p.name,
             p.image_url || p.image || '',
             p.category ? p.category.category_name : 'No Category',

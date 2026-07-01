@@ -306,4 +306,39 @@ document.addEventListener('DOMContentLoaded', function () {
     window.refreshVariantTable = (variants) => {
         renderTable(variants);
     };
+
+    // Bulk Upload Variants submit handler
+    $(document).on("submit", "#bulkUploadVariantsForm", function (e) {
+        e.preventDefault();
+        const submitBtn = $(this).find(".bulk_submit_btn");
+        submitBtn.attr("disabled", true).html("Uploading...");
+
+        const formdata = new FormData(this);
+        $.ajax({
+            url: "/product-variants/bulk-upload",
+            method: "POST",
+            dataType: "json",
+            data: formdata,
+            processData: false,
+            contentType: false,
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function (response) {
+                submitBtn.removeAttr("disabled").html("Start Upload");
+                $("#bulkUploadVariantsForm")[0].reset();
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('bulkUploadVariantsModal')).hide();
+                
+                // Refresh table grid
+                renderTable(response.variants || []);
+                Swal.fire("Success", response.message, "success");
+            },
+            error: function (jqXHR) {
+                submitBtn.removeAttr("disabled").html("Start Upload");
+                let errorMsg = "Failed to upload file";
+                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    errorMsg = jqXHR.responseJSON.message;
+                }
+                Swal.fire("Error", errorMsg, "error");
+            }
+        });
+    });
 });
