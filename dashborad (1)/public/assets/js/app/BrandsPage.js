@@ -207,3 +207,38 @@ $(document).on("click", ".delete_btn", function () {
         }
     });
 });
+
+// Bulk Upload submit handler
+$(document).on("submit", "#bulkUploadBrandsForm", function (e) {
+    e.preventDefault();
+    const submitBtn = $(".bulk_submit_btn");
+    submitBtn.attr("disabled", true).html("Uploading...");
+
+    const formdata = new FormData(this);
+    $.ajax({
+        url: "/brands/bulk-upload",
+        method: "POST",
+        dataType: "json",
+        data: formdata,
+        processData: false,
+        contentType: false,
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        success: function (response) {
+            submitBtn.removeAttr("disabled").html("Start Upload");
+            $("#bulkUploadBrandsForm")[0].reset();
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('bulkUploadBrandsModal')).hide();
+            
+            // Refresh table grid
+            renderGrid(response.brands);
+            Swal.fire("Success", response.message, "success");
+        },
+        error: function (jqXHR) {
+            submitBtn.removeAttr("disabled").html("Start Upload");
+            let errorMsg = "Failed to upload file";
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                errorMsg = jqXHR.responseJSON.message;
+            }
+            Swal.fire("Error", errorMsg, "error");
+        }
+    });
+});

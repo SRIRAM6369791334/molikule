@@ -22,6 +22,15 @@ class Brand extends Model
         'is_featured',
         'show_on_homepage',
         'sort_order',
+        'website_url',
+        'contact_email',
+        'contact_phone',
+        'address',
+        'brand_story',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'canonical_url',
     ];
 
     protected $casts = [

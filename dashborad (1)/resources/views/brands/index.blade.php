@@ -49,9 +49,14 @@
                                 </div>
                             @endif
                         </div>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandsModal">
-                            <i class="mdi mdi-plus me-1"></i> Add Brand
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bulkUploadBrandsModal">
+                                <i class="mdi mdi-upload me-1"></i> Bulk Upload
+                            </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandsModal">
+                                <i class="mdi mdi-plus me-1"></i> Add Brand
+                            </button>
+                        </div>
                     </div>
                     
                     <div id="table-gridjs"></div>
@@ -131,6 +136,39 @@
                         <button class="btn btn-primary edit_submit_btn w-100" type="submit">Update Brand</button>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Upload Modal -->
+    <div class="modal fade" id="bulkUploadBrandsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bulk Upload Brands</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="bulkUploadBrandsForm" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label">Upload CSV File</label>
+                            <input type="file" class="form-control" name="file" accept=".csv" required>
+                        </div>
+                        <div class="alert alert-info py-2 small mb-3">
+                            <strong>Note:</strong> Brand logos will be set to optional during import. You can upload logos manually later by editing individual brands.
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ route('brands.download-template') }}" class="btn btn-link text-decoration-none p-0 small">
+                                <i class="mdi mdi-download"></i> Download Sample CSV Template
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary bulk_submit_btn">Start Upload</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
