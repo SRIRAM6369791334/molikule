@@ -42,6 +42,7 @@ const renderGrid = (brands) => {
         gridNew.updateConfig({
             data: brands.map((brand, index) => [
                 index + 1,
+                brand.brand_id,
                 brand.brand_name,
                 brand.logo || '',
                 brand.brand_id,
@@ -54,13 +55,14 @@ const renderGrid = (brands) => {
     gridNew = new gridjs.Grid({
         columns: [
             "S.NO",
+            "Brand ID",
             "Brand Name",
             {
                 name: "Logo",
                 formatter: (cell, row) => {
-                    const id = row.cells[3].data;
-                    const name = row.cells[1].data;
-                    const status = row.cells[4].data;
+                    const id = row.cells[4].data;
+                    const name = row.cells[2].data;
+                    const status = row.cells[5].data;
                     
                     if (!cell || cell === '') {
                         return gridjs.html(`
@@ -82,16 +84,16 @@ const renderGrid = (brands) => {
                 name: "Action",
                 sort: false,
                 formatter: (_, row) => {
-                    const id = row.cells[3].data;
-                    const name = row.cells[1].data;
-                    const logo = row.cells[2].data;
+                    const id = row.cells[4].data;
+                    const name = row.cells[2].data;
+                    const logo = row.cells[3].data;
                     return gridjs.html(`
                         <div class="d-flex gap-2">
                             <button class="btn btn-sm btn-soft-primary edit_btn" 
                                 data-brandid="${id}" 
                                 data-brandname="${name}" 
                                 data-brandimage="${logo}"
-                                data-brandstatus="${row.cells[4].data}"
+                                data-brandstatus="${row.cells[5].data}"
                                 data-bs-toggle="modal" data-bs-target="#editBrandsModal">
                                 <i class="mdi mdi-pencil"></i> Edit
                             </button>
@@ -102,13 +104,15 @@ const renderGrid = (brands) => {
                     `);
                 }
             },
-            { name: "ID", hidden: true }
+            { name: "ID", hidden: true },
+            { name: "Status", hidden: true }
         ],
         pagination: { limit: 10 },
         sort: true,
         search: true,
         data: brands.map((brand, index) => [
             index + 1,
+            brand.brand_id,
             brand.brand_name,
             brand.logo || '',
             brand.brand_id,

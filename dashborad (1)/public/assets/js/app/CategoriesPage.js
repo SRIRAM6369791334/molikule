@@ -130,6 +130,7 @@ const renderGrid = (categories) => {
         gridNew.updateConfig({
             data: categories.map((cat, index) => [
                 index + 1,
+                cat.category_id,
                 cat.category_name,
                 cat.image || '',
                 null, // Action
@@ -147,17 +148,18 @@ const renderGrid = (categories) => {
     gridNew = new gridjs.Grid({
         columns: [
             "S.NO",
+            "Category ID",
             "Category Name",
             {
                 name: "Category Image",
                 formatter: (cell, row) => {
-                    const id = row.cells[4].data;
-                    const name = row.cells[1].data;
-                    const primaryColor = row.cells[5].data || '';
-                    const lightColor = row.cells[6].data || '';
-                    const overlay = row.cells[7].data || '';
-                    const borderRadius = row.cells[8].data || '';
-                    const bgImage = row.cells[9].data || '';
+                    const id = row.cells[5].data;
+                    const name = row.cells[2].data;
+                    const primaryColor = row.cells[6].data || '';
+                    const lightColor = row.cells[7].data || '';
+                    const overlay = row.cells[8].data || '';
+                    const borderRadius = row.cells[9].data || '';
+                    const bgImage = row.cells[10].data || '';
                     
                     if (!cell || cell === '') {
                         return gridjs.html(`
@@ -183,14 +185,14 @@ const renderGrid = (categories) => {
                 name: "Action",
                 sort: false,
                 formatter: (_, row) => {
-                    const id = row.cells[4].data;
-                    const name = row.cells[1].data;
-                    const image = row.cells[2].data;
-                    const primaryColor = row.cells[5].data || '';
-                    const lightColor = row.cells[6].data || '';
-                    const overlay = row.cells[7].data || '';
-                    const borderRadius = row.cells[8].data || '';
-                    const bgImage = row.cells[9].data || '';
+                    const id = row.cells[5].data;
+                    const name = row.cells[2].data;
+                    const image = row.cells[3].data;
+                    const primaryColor = row.cells[6].data || '';
+                    const lightColor = row.cells[7].data || '';
+                    const overlay = row.cells[8].data || '';
+                    const borderRadius = row.cells[9].data || '';
+                    const bgImage = row.cells[10].data || '';
                     return gridjs.html(`
                         <div class="d-flex gap-2">
                             <button class="btn btn-sm btn-soft-primary edit_btn" 
@@ -224,6 +226,7 @@ const renderGrid = (categories) => {
         search: true,
         data: categories.map((cat, index) => [
             index + 1,
+            cat.category_id,
             cat.category_name,
             cat.image || '',
             null, // Action dummy
