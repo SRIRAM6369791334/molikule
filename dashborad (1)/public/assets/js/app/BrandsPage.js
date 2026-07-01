@@ -43,7 +43,7 @@ const renderGrid = (brands) => {
             data: brands.map((brand, index) => [
                 index + 1,
                 brand.brand_name,
-                brand.logo || '/assets/images/placeholder.png',
+                brand.logo || '',
                 brand.brand_id,
                 brand.is_active
             ])
@@ -57,7 +57,26 @@ const renderGrid = (brands) => {
             "Brand Name",
             {
                 name: "Logo",
-                formatter: (cell) => gridjs.html(`<img src="${cell}" style="width:50px; height:50px; object-fit:contain;" class="rounded border">`)
+                formatter: (cell, row) => {
+                    const id = row.cells[3].data;
+                    const name = row.cells[1].data;
+                    const status = row.cells[4].data;
+                    
+                    if (!cell || cell === '') {
+                        return gridjs.html(`
+                            <button class="btn btn-sm btn-soft-success edit_btn" 
+                                data-brandid="${id}" 
+                                data-brandname="${name}" 
+                                data-brandimage=""
+                                data-brandstatus="${status}"
+                                data-bs-toggle="modal" data-bs-target="#editBrandsModal"
+                                style="padding: 4px 8px; font-size: 11px;">
+                                <i class="mdi mdi-image-plus me-1"></i>Add Logo
+                            </button>
+                        `);
+                    }
+                    return gridjs.html(`<img src="${cell}" style="width:50px; height:50px; object-fit:contain;" class="rounded border">`);
+                }
             },
             {
                 name: "Action",
@@ -91,7 +110,7 @@ const renderGrid = (brands) => {
         data: brands.map((brand, index) => [
             index + 1,
             brand.brand_name,
-            brand.logo || '/assets/images/placeholder.png',
+            brand.logo || '',
             brand.brand_id,
             brand.is_active
         ]),
