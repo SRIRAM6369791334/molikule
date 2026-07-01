@@ -711,7 +711,7 @@ class ProductController extends Controller
 
         // Clean headers (remove whitespace/BOM)
         $header = array_map(function($h) {
-            return trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h));
+            return strtolower(trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h)));
         }, $header);
 
         $inserted = 0;
@@ -729,9 +729,28 @@ class ProductController extends Controller
 
                 $data = array_combine($header, $row);
                 
-                $name = isset($data['name']) ? trim($data['name']) : null;
-                $categoryId = isset($data['category_id']) ? (int)trim($data['category_id']) : null;
-                $brandId = isset($data['brand_id']) ? (int)trim($data['brand_id']) : null;
+                // Helper to find value by matching keys (exact or prefix match)
+                $getVal = function($possibleKeys) use ($data) {
+                    foreach ($possibleKeys as $key) {
+                        if (isset($data[$key])) {
+                            return trim($data[$key]);
+                        }
+                        // Prefix/partial matching
+                        foreach ($data as $k => $v) {
+                            if (str_starts_with($k, $key) || str_starts_with($key, $k)) {
+                                return trim($v);
+                            }
+                        }
+                    }
+                    return null;
+                };
+
+                $name = $getVal(['name']);
+                $categoryIdVal = $getVal(['category_id', 'category_i']);
+                $brandIdVal = $getVal(['brand_id', 'brand_i']);
+
+                $categoryId = $categoryIdVal !== null ? (int)$categoryIdVal : null;
+                $brandId = $brandIdVal !== null ? (int)$brandIdVal : null;
                 
                 if (empty($name) || empty($categoryId) || empty($brandId)) {
                     $skipped++;
@@ -750,11 +769,14 @@ class ProductController extends Controller
                 }
 
                 // Primary Variant fields
-                $variantValue = isset($data['variant_value']) ? trim($data['variant_value']) : '';
-                $variantUnit = isset($data['variant_unit']) ? trim($data['variant_unit']) : '';
-                $variantMrp = isset($data['variant_mrp']) ? (float)$data['variant_mrp'] : 0.00;
-                $variantStock = isset($data['variant_stock']) ? (int)$data['variant_stock'] : 0;
-                $variantSku = isset($data['variant_sku']) ? trim($data['variant_sku']) : '';
+                $variantValue = $getVal(['variant_value', 'variant_va', 'variant_val']) ?? '';
+                $variantUnit = $getVal(['variant_unit', 'variant_un']) ?? '';
+                $variantMrpVal = $getVal(['variant_mrp', 'variant_mr']) ?? '0';
+                $variantStockVal = $getVal(['variant_stock', 'variant_st']) ?? '0';
+                $variantSku = $getVal(['variant_sku']) ?? '';
+
+                $variantMrp = (float)$variantMrpVal;
+                $variantStock = (int)$variantStockVal;
 
                 if (empty($variantSku)) {
                     $skipped++;
@@ -767,14 +789,14 @@ class ProductController extends Controller
                     [
                         'category_id' => $category->category_id,
                         'brand_id' => $brand->brand_id,
-                        'short_description' => isset($data['short_description']) ? trim($data['short_description']) : '',
-                        'description' => isset($data['description']) ? trim($data['description']) : '',
-                        'weight' => isset($data['weight']) ? (float)$data['weight'] : 0.00,
-                        'weight_unit' => isset($data['weight_unit']) ? trim($data['weight_unit']) : 'kg',
-                        'length' => isset($data['length']) ? (float)$data['length'] : 0.00,
-                        'width' => isset($data['width']) ? (float)$data['width'] : 0.00,
-                        'height' => isset($data['height']) ? (float)$data['height'] : 0.00,
-                        'dimension_unit' => isset($data['dimension_unit']) ? trim($data['dimension_unit']) : 'cm',
+                        'short_description' => $getVal(['short_description', 'short_desc']) ?? '',
+                        'description' => $getVal(['description', 'desc']) ?? '',
+                        'weight' => (float)($getVal(['weight']) ?? 0.00),
+                        'weight_unit' => $getVal(['weight_unit']) ?? 'kg',
+                        'length' => (float)($getVal(['length']) ?? 0.00),
+                        'width' => (float)($getVal(['width']) ?? 0.00),
+                        'height' => (float)($getVal(['height']) ?? 0.00),
+                        'dimension_unit' => $getVal(['dimension_unit', 'dimension']) ?? 'cm',
                         'active' => true,
                         'is_featured' => false,
                         'is_trending' => false,
