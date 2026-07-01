@@ -68,13 +68,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('categories-ajax', [CategoryController::class, 'getCategoriesAjax'])->name('categories.ajax');
     Route::get('categories-grid-ajax', [CategoryController::class, 'ajaxIndex'])->name('categories.grid-ajax');
 
+    Route::get('brands/download-template', [BrandController::class, 'downloadTemplate'])->name('brands.download-template');
+    Route::post('brands/bulk-upload', [BrandController::class, 'bulkUpload'])->name('brands.bulk-upload');
     Route::resource('brands', BrandController::class);
     Route::post('brands/bulk-update', [BrandController::class, 'bulkUpdate'])->name('brands.bulk-update');
     Route::post('brands/{brand}/toggle-status', [BrandController::class, 'toggleStatus'])->name('brands.toggle-status');
     Route::get('brands-stats', [BrandController::class, 'getStats'])->name('brands.stats');
     Route::get('brands-ajax', [BrandController::class, 'getBrandsAjax'])->name('brands.ajax');
-    Route::post('brands/bulk-upload', [BrandController::class, 'bulkUpload'])->name('brands.bulk-upload');
-    Route::get('brands/download-template', [BrandController::class, 'downloadTemplate'])->name('brands.download-template');
 
     // Category AJAX (Kumarimall Compatible)
     Route::post('updateCategories/{id}', [CategoryController::class, 'update']);
