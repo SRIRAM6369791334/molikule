@@ -172,8 +172,8 @@ class BrandController extends Controller
 
         $callback = function() {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['brand_name', 'website_url', 'is_active', 'is_featured']);
-            fputcsv($file, ['Example Brand', 'https://example.com', '1', '0']);
+            fputcsv($file, ['brand_name']);
+            fputcsv($file, ['Example Brand']);
             fclose($file);
         };
 
@@ -214,14 +214,12 @@ class BrandController extends Controller
                 continue;
             }
 
-            // Sync brand by name (logo is set to optional/skipped initially)
+            // Sync brand by name (logo is null, is_active is default true/1)
             $brand = Brand::updateOrCreate(
                 ['brand_name' => $brandName],
                 [
                     'slug' => Str::slug($brandName),
-                    'website_url' => isset($data['website_url']) ? trim($data['website_url']) : null,
-                    'is_active' => isset($data['is_active']) ? (bool)$data['is_active'] : true,
-                    'is_featured' => isset($data['is_featured']) ? (bool)$data['is_featured'] : false,
+                    'is_active' => true, // default active
                 ]
             );
 
@@ -236,7 +234,7 @@ class BrandController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Bulk upload complete. Inserted: $inserted, Updated: $updated, Skipped: $skipped",
+            'message' => "Bulk upload complete. Created: $inserted, Updated: $updated, Skipped: $skipped",
             'brands' => Brand::orderBy('brand_id', 'desc')->get()
         ]);
     }
