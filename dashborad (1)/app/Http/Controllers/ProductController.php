@@ -673,4 +673,180 @@ class ProductController extends Controller
             return null;
         }
     }
+
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="products_template.csv"',
+        ];
+
+        $callback = function() {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, [
+                'name', 'category_name', 'brand_name', 'short_description', 'description', 
+                'weight', 'weight_unit', 'length', 'width', 'height', 'dimension_unit', 
+                'variant_value', 'variant_unit', 'variant_mrp', 'variant_stock', 'variant_sku'
+            ]);
+            fputcsv($file, [
+                'Wax polish', 'AUTO CARE', 'Molikule Green Care', 'Wax Polish enhances shine.', 'Wax Polish is a protective and polishing solution...', 
+                '5.25', 'kg', '20.00', '14.00', '31.98', 'cm', 
+                'Wox Polish', '5L', '2400.00', '50', 'A-WX-01'
+            ]);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function bulkUpload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:5120',
+        ]);
+
+        $file = $request->file('file');
+        $fileHandle = fopen($file->getRealPath(), 'r');
+        $header = fgetcsv($fileHandle); // Get headers
+
+        // Clean headers (remove whitespace/BOM)
+        $header = array_map(function($h) {
+            return trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h));
+        }, $header);
+
+        $inserted = 0;
+        $updated = 0;
+        $skipped = 0;
+
+        DB::beginTransaction();
+        try {
+            while (($row = fgetcsv($fileHandle)) !== false) {
+                // Check if row matches header count
+                if (count($row) !== count($header)) {
+                    $skipped++;
+                    continue;
+                }
+
+                $data = array_combine($header, $row);
+                
+                $name = isset($data['name']) ? trim($data['name']) : null;
+                $categoryName = isset($data['category_name']) ? trim($data['category_name']) : null;
+                $brandName = isset($data['brand_name']) ? trim($data['brand_name']) : null;
+                
+                if (empty($name) || empty($categoryName) || empty($brandName)) {
+                    $skipped++;
+                    continue;
+                }
+
+                // 1. Get or Create Category
+                $category = Category::firstOrCreate(
+                    ['category_name' => $categoryName],
+                    [
+                        'slug' => Str::slug($categoryName),
+                        'is_active' => true
+                    ]
+                );
+
+                // 2. Get or Create Brand
+                $brand = Brand::firstOrCreate(
+                    ['brand_name' => $brandName],
+                    [
+                        'slug' => Str::slug($brandName),
+                        'is_active' => true
+                    ]
+                );
+
+                // Primary Variant fields
+                $variantValue = isset($data['variant_value']) ? trim($data['variant_value']) : '';
+                $variantUnit = isset($data['variant_unit']) ? trim($data['variant_unit']) : '';
+                $variantMrp = isset($data['variant_mrp']) ? (float)$data['variant_mrp'] : 0.00;
+                $variantStock = isset($data['variant_stock']) ? (int)$data['variant_stock'] : 0;
+                $variantSku = isset($data['variant_sku']) ? trim($data['variant_sku']) : '';
+
+                if (empty($variantSku)) {
+                    $skipped++;
+                    continue;
+                }
+
+                // 3. Create or Update Product
+                $product = Product::updateOrCreate(
+                    ['name' => $name],
+                    [
+                        'category_id' => $category->category_id,
+                        'brand_id' => $brand->brand_id,
+                        'short_description' => isset($data['short_description']) ? trim($data['short_description']) : '',
+                        'description' => isset($data['description']) ? trim($data['description']) : '',
+                        'weight' => isset($data['weight']) ? (float)$data['weight'] : 0.00,
+                        'weight_unit' => isset($data['weight_unit']) ? trim($data['weight_unit']) : 'kg',
+                        'length' => isset($data['length']) ? (float)$data['length'] : 0.00,
+                        'width' => isset($data['width']) ? (float)$data['width'] : 0.00,
+                        'height' => isset($data['height']) ? (float)$data['height'] : 0.00,
+                        'dimension_unit' => isset($data['dimension_unit']) ? trim($data['dimension_unit']) : 'cm',
+                        'active' => true,
+                        'is_featured' => false,
+                        'is_trending' => false,
+                        'mrp_price' => $variantMrp,
+                        'stock_quantity' => $variantStock,
+                        'slug' => Str::slug($name),
+                    ]
+                );
+
+                // 4. Create or Update the first Variant
+                $variantName = ($variantValue && $variantUnit) ? ($variantValue . ' – ' . $variantUnit) : ($variantValue ?: ($variantUnit ?: 'Standard'));
+
+                $variant = ProductVariant::updateOrCreate(
+                    ['sku' => $variantSku],
+                    [
+                        'product_id' => $product->product_id,
+                        'variant_name' => $variantName,
+                        'variant_type' => 'flavour_volume',
+                        'value' => $variantValue,
+                        'variant_unit' => $variantUnit,
+                        'mrp_price' => $variantMrp,
+                        'stock_quantity' => $variantStock,
+                        'active' => true,
+                    ]
+                );
+
+                // 5. Create a complete Audit Snapshot (ProductRecord)
+                $variants = $product->variants()->get(); // Get fresh variants
+                \App\Models\ProductRecord::updateOrCreate(
+                    ['sku' => $variantSku],
+                    [
+                        'product_name'      => $product->name,
+                        'category_name'     => $category->category_name ?? 'N/A',
+                        'brand_name'        => $brand->brand_name ?? 'N/A',
+                        'product_full_data'  => $product->toArray(),
+                        'category_full_data' => $category ? $category->toArray() : [],
+                        'brand_full_data'    => $brand ? $brand->toArray() : [],
+                        'variants_full_data' => $variants->toArray(),
+                    ]
+                );
+
+                if ($product->wasRecentlyCreated) {
+                    $inserted++;
+                } else {
+                    $updated++;
+                }
+            }
+
+            fclose($fileHandle);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk upload complete. Created: $inserted, Updated: $updated, Skipped: $skipped",
+                'products' => Product::with(['category', 'brand'])->latest()->get()->values()
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            fclose($fileHandle);
+            \Log::error('Product Bulk Upload Failed', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Product Bulk Upload Failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

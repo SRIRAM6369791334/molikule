@@ -17,13 +17,30 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+let gridNewProduct = null;
+
 /**
  * Renders the Grid.js table for Products
  */
 function renderProductGrid(products, wrapper) {
     if (!wrapper) return;
 
-    new gridjs.Grid({
+    if (gridNewProduct) {
+        gridNewProduct.updateConfig({
+            data: products.map((p, index) => [
+                index + 1,
+                p.name,
+                p.image_url || p.image || '',
+                p.category ? p.category.category_name : 'No Category',
+                p.brand ? p.brand.brand_name : 'No Brand',
+                p.active,
+                p.product_id
+            ])
+        }).forceRender();
+        return;
+    }
+
+    gridNewProduct = new gridjs.Grid({
         columns: [
             "S.NO",
             {
@@ -228,3 +245,38 @@ function initProductFormValidation(form) {
         form.submit();
     });
 }
+
+// Bulk Upload Products submit handler
+$(document).on("submit", "#bulkUploadProductsForm", function (e) {
+    e.preventDefault();
+    const submitBtn = $(".bulk_submit_btn");
+    submitBtn.attr("disabled", true).html("Uploading...");
+
+    const formdata = new FormData(this);
+    $.ajax({
+        url: "/products/bulk-upload",
+        method: "POST",
+        dataType: "json",
+        data: formdata,
+        processData: false,
+        contentType: false,
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        success: function (response) {
+            submitBtn.removeAttr("disabled").html("Start Upload");
+            $("#bulkUploadProductsForm")[0].reset();
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('bulkUploadProductsModal')).hide();
+            
+            // Refresh table grid
+            renderProductGrid(response.products, document.getElementById("table-gridjs"));
+            Swal.fire("Success", response.message, "success");
+        },
+        error: function (jqXHR) {
+            submitBtn.removeAttr("disabled").html("Start Upload");
+            let errorMsg = "Failed to upload file";
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                errorMsg = jqXHR.responseJSON.message;
+            }
+            Swal.fire("Error", errorMsg, "error");
+        }
+    });
+});

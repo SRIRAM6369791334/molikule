@@ -49,6 +49,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('/users/{user}/toggle-status', [AuthController::class, 'toggleUserStatus'])->name('users.toggle-status');
 
     // Product Management
+    Route::get('products/download-template', [ProductController::class, 'downloadTemplate'])->name('products.download-template');
+    Route::post('products/bulk-upload', [ProductController::class, 'bulkUpload'])->name('products.bulk-upload');
     Route::resource('products', ProductController::class);
     Route::get('/low-stock', [ProductController::class, 'lowStock'])->name('products.low-stock');
     Route::get('/stocks', [ProductController::class, 'stocks'])->name('products.stocks');

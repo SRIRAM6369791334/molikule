@@ -31,6 +31,9 @@
                             <p class="text-muted mb-0">Manage your entire inventory and product details</p>
                         </div>
                         <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bulkUploadProductsModal">
+                                <i class="mdi mdi-upload me-1"></i> Bulk Upload
+                            </button>
                              <a href="{{ route('product-variants.index') }}" class="btn btn-soft-info">
                                 <i class="mdi mdi-layers me-1"></i> Variants
                             </a>
@@ -42,6 +45,39 @@
                     
                     <div id="table-gridjs"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Upload Products Modal -->
+    <div class="modal fade" id="bulkUploadProductsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bulk Upload Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="bulkUploadProductsForm" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label">Upload CSV File</label>
+                            <input type="file" class="form-control" name="file" accept=".csv" required>
+                        </div>
+                        <div class="alert alert-info py-2 small mb-3">
+                            <strong>Note:</strong> Product images and variant assets will be set to optional during import. You can edit them manually later from the Edit Product interface.
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ route('products.download-template') }}" class="btn btn-link text-decoration-none p-0 small">
+                                <i class="mdi mdi-download"></i> Download Sample CSV Template
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary bulk_submit_btn">Start Upload</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
