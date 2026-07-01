@@ -131,7 +131,7 @@ const renderGrid = (categories) => {
             data: categories.map((cat, index) => [
                 index + 1,
                 cat.category_name,
-                cat.image || '/assets/images/placeholder.png',
+                cat.image || '',
                 null, // Action
                 cat.category_id,
                 cat.theme_primary_color || '',
@@ -150,7 +150,34 @@ const renderGrid = (categories) => {
             "Category Name",
             {
                 name: "Category Image",
-                formatter: (cell) => gridjs.html(`<img src="${cell}" style="width:50px; height:50px; object-fit:cover;" class="rounded">`)
+                formatter: (cell, row) => {
+                    const id = row.cells[4].data;
+                    const name = row.cells[1].data;
+                    const primaryColor = row.cells[5].data || '';
+                    const lightColor = row.cells[6].data || '';
+                    const overlay = row.cells[7].data || '';
+                    const borderRadius = row.cells[8].data || '';
+                    const bgImage = row.cells[9].data || '';
+                    
+                    if (!cell || cell === '') {
+                        return gridjs.html(`
+                            <button class="btn btn-sm btn-soft-success edit_btn" 
+                                data-categoriesid="${id}" 
+                                data-categoriesname="${name}" 
+                                data-categoriesimage=""
+                                data-theme-primary="${primaryColor}"
+                                data-theme-light="${lightColor}"
+                                data-theme-overlay="${overlay}"
+                                data-theme-radius="${borderRadius}"
+                                data-theme-bg="${bgImage}"
+                                data-bs-toggle="modal" data-bs-target="#editCategoriesModal"
+                                style="padding: 4px 8px; font-size: 11px;">
+                                <i class="mdi mdi-image-plus me-1"></i>Add Image
+                            </button>
+                        `);
+                    }
+                    return gridjs.html(`<img src="${cell}" style="width:50px; height:50px; object-fit:cover;" class="rounded">`);
+                }
             },
             {
                 name: "Action",
@@ -198,7 +225,7 @@ const renderGrid = (categories) => {
         data: categories.map((cat, index) => [
             index + 1,
             cat.category_name,
-            cat.image || '/assets/images/placeholder.png',
+            cat.image || '',
             null, // Action dummy
             cat.category_id,
             cat.theme_primary_color || '',
@@ -309,6 +336,41 @@ $(document).on("click", ".delete_btn", function () {
                     Swal.fire("Error", jqXHR.responseJSON?.message || "Deletion failed", "error");
                 }
             });
+        }
+    });
+});
+
+// Bulk Upload submit handler
+$(document).on("submit", "#bulkUploadCategoriesForm", function (e) {
+    e.preventDefault();
+    const submitBtn = $(".bulk_submit_btn");
+    submitBtn.attr("disabled", true).html("Uploading...");
+
+    const formdata = new FormData(this);
+    $.ajax({
+        url: "/categories/bulk-upload",
+        method: "POST",
+        dataType: "json",
+        data: formdata,
+        processData: false,
+        contentType: false,
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        success: function (response) {
+            submitBtn.removeAttr("disabled").html("Start Upload");
+            $("#bulkUploadCategoriesForm")[0].reset();
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('bulkUploadCategoriesModal')).hide();
+            
+            // Refresh table grid
+            renderGrid(response.categories);
+            Swal.fire("Success", response.message, "success");
+        },
+        error: function (jqXHR) {
+            submitBtn.removeAttr("disabled").html("Start Upload");
+            let errorMsg = "Failed to upload file";
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                errorMsg = jqXHR.responseJSON.message;
+            }
+            Swal.fire("Error", errorMsg, "error");
         }
     });
 });

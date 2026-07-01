@@ -184,4 +184,80 @@ class CategoryController extends Controller
             'is_active' => $category->is_active
         ]);
     }
+
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="categories_template.csv"',
+        ];
+
+        $callback = function() {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['category_name']);
+            fputcsv($file, ['Example Category']);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function bulkUpload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:5120',
+        ]);
+
+        $file = $request->file('file');
+        $fileHandle = fopen($file->getRealPath(), 'r');
+        $header = fgetcsv($fileHandle); // Get headers
+
+        // Clean headers (remove whitespace/BOM)
+        $header = array_map(function($h) {
+            return trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h));
+        }, $header);
+
+        $inserted = 0;
+        $updated = 0;
+        $skipped = 0;
+
+        while (($row = fgetcsv($fileHandle)) !== false) {
+            // Check if row matches header count
+            if (count($row) !== count($header)) {
+                $skipped++;
+                continue;
+            }
+
+            $data = array_combine($header, $row);
+            $categoryName = isset($data['category_name']) ? trim($data['category_name']) : null;
+
+            if (empty($categoryName)) {
+                $skipped++;
+                continue;
+            }
+
+            // Sync category by name (image is null, is_active is default true/1)
+            $category = Category::updateOrCreate(
+                ['category_name' => $categoryName],
+                [
+                    'slug' => Str::slug($categoryName),
+                    'is_active' => true, // default active
+                ]
+            );
+
+            if ($category->wasRecentlyCreated) {
+                $inserted++;
+            } else {
+                $updated++;
+            }
+        }
+
+        fclose($fileHandle);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Bulk upload complete. Created: $inserted, Updated: $updated, Skipped: $skipped",
+            'categories' => Category::all()
+        ]);
+    }
 }

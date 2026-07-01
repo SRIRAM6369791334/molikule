@@ -60,7 +60,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/products/bulk-update', [ProductController::class, 'bulkUpdate'])->name('products.bulk-update');
     Route::post('/products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
 
-    // Categories & Brands
+    Route::get('categories/download-template', [CategoryController::class, 'downloadTemplate'])->name('categories.download-template');
+    Route::post('categories/bulk-upload', [CategoryController::class, 'bulkUpload'])->name('categories.bulk-upload');
     Route::resource('categories', CategoryController::class);
     Route::post('categories/bulk-update', [CategoryController::class, 'bulkUpdate'])->name('categories.bulk-update');
     Route::post('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])->name('categories.toggle-status');
