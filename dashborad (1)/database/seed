@@ -1,0 +1,82 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+
+class GenerateSlugsSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run()
+    {
+        $this->command->info('Starting slug generation...');
+
+        // Generate slugs for brands
+        $this->generateSlugsForModel(Brand::class, 'brand_name', 'brands');
+
+        // Generate slugs for categories
+        $this->generateSlugsForModel(Category::class, 'category_name', 'categories');
+
+        // Generate slugs for products
+        $this->generateSlugsForModel(Product::class, 'name', 'products');
+
+        $this->command->info('Slug generation completed!');
+    }
+
+    /**
+     * Generate slugs for a specific model
+     */
+    private function generateSlugsForModel($modelClass, $nameColumn, $tableName)
+    {
+        $this->command->info("Generating slugs for {$tableName}...");
+
+        $models = $modelClass::whereNull('slug')->get();
+
+        foreach ($models as $model) {
+            $originalName = $model->$nameColumn;
+            $slug = $this->generateUniqueSlug($modelClass, $originalName, $model->getKey());
+            $model->update(['slug' => $slug]);
+        }
+
+        $this->command->info("Generated slugs for {$models->count()} {$tableName}");
+    }
+
+    /**
+     * Generate unique slug
+     */
+    private function generateUniqueSlug($modelClass, $name, $excludeId = null)
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while ($this->slugExists($modelClass, $slug, $excludeId)) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Check if slug exists in database
+     */
+    private function slugExists($modelClass, $slug, $excludeId = null)
+    {
+        $query = $modelClass::where('slug', $slug);
+        
+        if ($excludeId) {
+            $primaryKey = (new $modelClass)->getKeyName();
+            $query->where($primaryKey, '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
+}

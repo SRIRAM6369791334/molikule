@@ -1,0 +1,103 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::table('products', function (Blueprint $table) {
+            // Add SEO fields if they don't exist
+            if (!Schema::hasColumn('products', 'slug')) {
+                $table->string('slug')->unique()->after('name');
+            }
+            if (!Schema::hasColumn('products', 'meta_title')) {
+                $table->string('meta_title')->nullable()->after('description');
+            }
+            if (!Schema::hasColumn('products', 'meta_description')) {
+                $table->text('meta_description')->nullable()->after('meta_title');
+            }
+            if (!Schema::hasColumn('products', 'meta_keywords')) {
+                $table->text('meta_keywords')->nullable()->after('meta_description');
+            }
+            if (!Schema::hasColumn('products', 'canonical_url')) {
+                $table->string('canonical_url')->nullable()->after('meta_keywords');
+            }
+            
+            // Add enhanced fields
+            if (!Schema::hasColumn('products', 'short_description')) {
+                $table->text('short_description')->nullable()->after('description');
+            }
+            if (!Schema::hasColumn('products', 'compare_price')) {
+                $table->decimal('compare_price', 10, 2)->nullable()->after('price');
+            }
+            if (!Schema::hasColumn('products', 'cost_per_item')) {
+                $table->decimal('cost_per_item', 10, 2)->nullable()->after('price');
+            }
+            if (!Schema::hasColumn('products', 'track_quantity')) {
+                $table->boolean('track_quantity')->default(true)->after('stock_quantity');
+            }
+            if (!Schema::hasColumn('products', 'continue_selling_when_out_of_stock')) {
+                $table->boolean('continue_selling_when_out_of_stock')->default(false)->after('track_quantity');
+            }
+            if (!Schema::hasColumn('products', 'barcode')) {
+                $table->string('barcode')->nullable()->after('sku');
+            }
+            if (!Schema::hasColumn('products', 'weight_unit')) {
+                $table->string('weight_unit', 10)->default('kg')->after('weight');
+            }
+            if (!Schema::hasColumn('products', 'length')) {
+                $table->decimal('length', 8, 2)->nullable()->after('weight');
+            }
+            if (!Schema::hasColumn('products', 'width')) {
+                $table->decimal('width', 8, 2)->nullable()->after('length');
+            }
+            if (!Schema::hasColumn('products', 'height')) {
+                $table->decimal('height', 8, 2)->nullable()->after('width');
+            }
+            if (!Schema::hasColumn('products', 'dimension_unit')) {
+                $table->string('dimension_unit', 10)->default('cm')->after('dimension');
+            }
+            if (!Schema::hasColumn('products', 'tags')) {
+                $table->json('tags')->nullable()->after('structured_data');
+            }
+            if (!Schema::hasColumn('products', 'custom_fields')) {
+                $table->json('custom_fields')->nullable()->after('tags');
+            }
+            
+            // Add performance indexes
+            if (!Schema::hasColumn('products', 'view_count')) {
+                $table->integer('view_count')->default(0)->after('active');
+            }
+            
+            // Add indexes
+            $table->index(['active', 'stock_quantity']);
+            $table->index(['category_id', 'active']);
+            $table->index(['brand_id', 'active']);
+            $table->index('slug');
+            $table->index(['price', 'active']);
+            $table->index('created_at');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropIndex(['active', 'stock_quantity']);
+            $table->dropIndex(['category_id', 'active']);
+            $table->dropIndex(['brand_id', 'active']);
+            $table->dropIndex('slug');
+            $table->dropIndex(['price', 'active']);
+            $table->dropIndex('created_at');
+            
+            $table->dropColumn([
+                'slug', 'short_description', 'compare_price', 'cost_per_item',
+                'track_quantity', 'continue_selling_when_out_of_stock', 'barcode',
+                'weight_unit', 'length', 'width', 'height', 'dimension_unit',
+                'tags', 'custom_fields', 'view_count'
+            ]);
+        });
+    }
+};

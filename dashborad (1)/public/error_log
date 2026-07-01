@@ -1,0 +1,9 @@
+[29-Apr-2026 06:31:59 UTC] PHP Warning:  require(/home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/composer/autoload_real.php on line 41
+[29-Apr-2026 06:31:59 UTC] PHP Warning:  require(/home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/composer/autoload_real.php on line 41
+[29-Apr-2026 06:31:59 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/composer/autoload_real.php(45): {closure}('6e3fae29631ef28...', '/home/vxmlyels/...')
+#1 /home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/autoload.php(22): ComposerAutoloaderInitc514d8f7b9fc5970bdd94287905ef584::getLoader()
+#2 /home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/public/index.php(14): require('/home/vxmlyels/...')
+#3 {main}
+  thrown in /home/vxmlyels/public_html/molikuledashboard.saitechnosolutions.in/vendor/composer/autoload_real.php on line 41

@@ -1,0 +1,31 @@
+# Ignore composer / vendor dependencies
+**/vendor/
+**/node_modules/
+
+# Ignore env files
+**/.env
+**/.env.*
+
+# Ignore zip files
+**/*.zip
+
+# Ignore IDE configs
+**/.vscode/
+**/.idea/
+
+# Ignore log files
+**/*.log
+
+# Ignore Laravel specific storage files/cache
+**/storage/*.key
+**/storage/framework/cache/data/*
+**/storage/framework/sessions/*
+**/storage/framework/views/*
+**/storage/logs/*
+**/storage/app/public/*
+**/public/storage
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+*.phpunit.result.cache

@@ -1,0 +1,101 @@
+/* Scoped styles for Molikule Latest Products Section */
+.molikule-latest-products {
+    position: relative;
+    z-index: 1;
+}
+
+.molikule-latest-products .title-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.molikule-latest-products .masonry-item {
+    padding: 0px 10px;
+}
+
+.molikule-latest-products .inner-container {
+    margin: 0px 5px;
+}
+
+.molikule-latest-products .pattern-layer .pattern-1 {
+    position: absolute;
+    left: 100px;
+    top: -350px;
+    width: 1090px;
+    height: 1090px;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+.molikule-latest-products .pattern-layer .pattern-2 {
+    position: absolute;
+    top: -200px;
+    right: 0px;
+    width: 1048px;
+    height: 1090px;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+.molikule-latest-products .nav-style-one .owl-nav {
+    position: absolute;
+    top: -80px;
+    right: 0px;
+}
+
+/* Specific overrides for latest products masonry blocks */
+.molikule-latest-products .shop-block-two .inner-box {
+    border: 1px solid #E5E5E5;
+    border-radius: 20px !important; /* Matching premium style */
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px);
+    transition: all 500ms ease;
+}
+
+.molikule-latest-products .shop-block-two:hover .inner-box {
+    border-color: var(--brand-primary);
+    box-shadow: 0px 10px 30px 0px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+.molikule-latest-products .filter-tabs li {
+    position: relative;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 30px;
+    font-weight: 600;
+    margin-right: 30px;
+    cursor: pointer;
+    color: var(--brand-dark);
+    transition: all 0.3s ease-in-out;
+}
+
+.molikule-latest-products .filter-tabs li.active,
+.molikule-latest-products .filter-tabs li:hover {
+    color: var(--brand-primary);
+}
+
+.molikule-latest-products .filter-tabs li:after {
+    position: absolute;
+    content: '';
+    width: 0%;
+    height: 2px;
+    left: 0px;
+    bottom: -2px;
+    background: var(--brand-primary);
+    transition: all 0.3s ease;
+}
+
+.molikule-latest-products .filter-tabs li:hover:after,
+.molikule-latest-products .filter-tabs li.active:after {
+    width: 100%;
+}
+
+/* Fix for masonry item spacing */
+.molikule-latest-products .items-container {
+    margin-left: -10px;
+    margin-right: -10px;
+}

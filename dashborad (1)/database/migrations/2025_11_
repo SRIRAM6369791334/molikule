@@ -1,0 +1,412 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations - SAFELY add only missing columns
+     */
+    public function up(): void
+    {
+        // Check and add missing product fields
+        $this->addMissingProductFields();
+        
+        // Check and add missing category fields  
+        $this->addMissingCategoryFields();
+        
+        // Check and add missing brand fields
+        $this->addMissingBrandFields();
+        
+        // Check and add missing banner fields
+        $this->addMissingBannerFields();
+    }
+
+    /**
+     * Add only missing product fields
+     */
+    protected function addMissingProductFields()
+    {
+        $columns = [
+            'slug' => "string",
+            'short_description' => "text", 
+            'compare_price' => "decimal:10,2",
+            'cost_per_item' => "decimal:10,2",
+            'track_quantity' => "boolean",
+            'continue_selling_when_out_of_stock' => "boolean",
+            'barcode' => "string:255",
+            'weight_unit' => "string:10",
+            'length' => "decimal:8,2",
+            'width' => "decimal:8,2", 
+            'height' => "decimal:8,2",
+            'dimension_unit' => "string:10",
+            'custom_fields' => "longText",
+            'view_count' => "unsignedInteger",
+            'product_count' => "unsignedInteger"
+        ];
+
+        foreach ($columns as $column => $type) {
+            if (!$this->columnExists('products', $column)) {
+                DB::statement("ALTER TABLE `products` ADD `$column` " . $this->getColumnType($type) . " NULL AFTER `name`");
+            }
+        }
+        
+        // Add indexes
+        $this->addProductIndexes();
+    }
+
+    /**
+     * Add only missing category fields
+     */
+    protected function addMissingCategoryFields()
+    {
+        $columns = [
+            'slug' => "string:255",
+            'short_description' => "text",
+            'meta_title' => "string:60", 
+            'meta_description' => "text:160",
+            'meta_keywords' => "text",
+            'breadcrumb_title' => "string:255",
+            'parent_breadcrumb_title' => "string:255",
+            'category_banner' => "string:255",
+            'category_tags' => "text",
+            'is_featured' => "tinyInteger",
+            'show_on_homepage' => "tinyInteger", 
+            'sort_order' => "unsignedInteger",
+            'has_children' => "boolean",
+            'product_count' => "unsignedInteger",
+            'view_count' => "unsignedInteger",
+            'category_content' => "longText",
+            'category_sidebar_content' => "text",
+            'category_video_url' => "string:500",
+            'og_title' => "text",
+            'og_description' => "text", 
+            'og_image' => "string:255",
+            'og_type' => "string:50",
+            'schema_markup' => "text",
+            'url_structure' => "string:500",
+            'canonical_url' => "string:500",
+            'index_status' => "enum:index,noindex,follow,nofollow",
+            'change_frequency' => "string:20",
+            'last_modified' => "timestamp",
+            'created_by' => "unsignedBigInteger"
+        ];
+
+        foreach ($columns as $column => $type) {
+            if (!$this->columnExists('categories', $column)) {
+                $afterClause = $column === 'slug' ? 'AFTER `name`' : '';
+                DB::statement("ALTER TABLE `categories` ADD `$column` " . $this->getColumnType($type) . " $afterClause");
+            }
+        }
+        
+        // Add indexes  
+        $this->addCategoryIndexes();
+    }
+
+    /**
+     * Add only missing brand fields
+     */
+    protected function addMissingBrandFields()
+    {
+        $columns = [
+            'slug' => "string:255",
+            'short_description' => "text",
+            'meta_title' => "string:60",
+            'meta_description' => "text:160", 
+            'meta_keywords' => "text",
+            'brand_logo' => "string:255",
+            'brand_banner' => "string:255",
+            'brand_video_url' => "string:500",
+            'website_url' => "string:500",
+            'facebook_url' => "string:500",
+            'instagram_url' => "string:500",
+            'twitter_url' => "string:500",
+            'youtube_url' => "string:500",
+            'linkedin_url' => "string:500",
+            'contact_email' => "string:255",
+            'contact_phone' => "string:20",
+            'support_email' => "string:255",
+            'brand_type' => "string:50",
+            'is_featured' => "tinyInteger",
+            'show_on_homepage' => "tinyInteger",
+            'is_verified' => "tinyInteger", 
+            'is_premium' => "tinyInteger",
+            'product_count' => "unsignedInteger",
+            'view_count' => "unsignedInteger",
+            'follower_count' => "unsignedInteger",
+            'rating_average' => "decimal:3,2",
+            'rating_count' => "unsignedInteger",
+            'country_of_origin' => "string:100",
+            'headquarters_address' => "string:500",
+            'established_year' => "string:4",
+            'brand_story' => "longText",
+            'brand_values' => "text",
+            'brand_mission' => "text",
+            'brand_vision' => "text",
+            'og_title' => "text",
+            'og_description' => "text",
+            'og_image' => "string:255",
+            'og_type' => "string:50",
+            'schema_markup' => "text",
+            'url_structure' => "string:500",
+            'canonical_url' => "string:500",
+            'index_status' => "enum:index,noindex,follow,nofollow", 
+            'change_frequency' => "string:20",
+            'last_modified' => "timestamp",
+            'custom_fields' => "longText",
+            'created_by' => "unsignedBigInteger"
+        ];
+
+        foreach ($columns as $column => $type) {
+            if (!$this->columnExists('brands', $column)) {
+                $afterClause = $column === 'slug' ? 'AFTER `name`' : '';
+                DB::statement("ALTER TABLE `brands` ADD `$column` " . $this->getColumnType($type) . " $afterClause");
+            }
+        }
+        
+        // Add indexes
+        $this->addBrandIndexes();
+    }
+
+    /**
+     * Add only missing banner fields
+     */
+    protected function addMissingBannerFields()
+    {
+        $columns = [
+            'slug' => "string:255",
+            'short_description' => "text",
+            'meta_title' => "string:60",
+            'meta_description' => "text:160",
+            'meta_keywords' => "text", 
+            'banner_type' => "string:50",
+            'display_position' => "string:50",
+            'sort_order' => "unsignedInteger",
+            'is_featured' => "tinyInteger",
+            'is_active' => "tinyInteger",
+            'button_text' => "string:100",
+            'button_url' => "string:500",
+            'button_color' => "string:20",
+            'background_color' => "string:20",
+            'text_color' => "string:20",
+            'overlay_color' => "string:20",
+            'overlay_opacity' => "decimal:3,2",
+            'mobile_image' => "string:255",
+            'tablet_image' => "string:255", 
+            'desktop_image' => "string:255",
+            'retina_image' => "string:255",
+            'video_url' => "string:500",
+            'video_poster' => "string:255",
+            'autoplay_video' => "boolean",
+            'loop_video' => "boolean",
+            'mute_video' => "boolean",
+            'display_duration' => "unsignedInteger",
+            'transition_duration' => "unsignedInteger",
+            'animation_type' => "string:50",
+            'easing_function' => "string:50",
+            'target_audience' => "json",
+            'display_conditions' => "json",
+            'device_targeting' => "json",
+            'location_targeting' => "json",
+            'campaign_name' => "string:255",
+            'click_count' => "unsignedInteger",
+            'view_count' => "unsignedInteger",
+            'click_through_rate' => "decimal:5,2",
+            'conversion_rate' => "decimal:5,2",
+            'start_date' => "timestamp",
+            'end_date' => "timestamp",
+            'display_schedule' => "json",
+            'show_on_mobile' => "tinyInteger",
+            'show_on_tablet' => "tinyInteger",
+            'show_on_desktop' => "tinyInteger",
+            'tracking_id' => "string:100",
+            'analytics_data' => "json",
+            'utm_source' => "string:100",
+            'utm_medium' => "string:100",
+            'utm_campaign' => "string:100",
+            'utm_term' => "string:100", 
+            'utm_content' => "string:100",
+            'og_title' => "text",
+            'og_description' => "text",
+            'og_image' => "string:255",
+            'og_type' => "string:50",
+            'schema_markup' => "text",
+            'custom_fields' => "longText",
+            'banner_metadata' => "json",
+            'created_by' => "unsignedBigInteger",
+            'updated_by' => "unsignedBigInteger",
+            'last_viewed_at' => "timestamp"
+        ];
+
+        foreach ($columns as $column => $type) {
+            if (!$this->columnExists('banners', $column)) {
+                $afterClause = $column === 'slug' ? 'AFTER `name`' : '';
+                DB::statement("ALTER TABLE `banners` ADD `$column` " . $this->getColumnType($type) . " $afterClause");
+            }
+        }
+        
+        // Add indexes
+        $this->addBannerIndexes();
+    }
+
+    /**
+     * Check if a column exists in a table
+     */
+    protected function columnExists($table, $column)
+    {
+        $columns = DB::getSchemaBuilder()->getColumnListing($table);
+        return in_array($column, $columns);
+    }
+
+    /**
+     * Get column type string
+     */
+    protected function getColumnType($type)
+    {
+        $typeMap = [
+            'string' => 'varchar(255)',
+            'string:255' => 'varchar(255)',
+            'string:100' => 'varchar(100)',
+            'string:60' => 'varchar(60)',
+            'string:50' => 'varchar(50)',
+            'string:20' => 'varchar(20)',
+            'string:10' => 'varchar(10)',
+            'string:4' => 'varchar(4)',
+            'text' => 'text',
+            'text:160' => 'text',
+            'longText' => 'longtext',
+            'boolean' => 'tinyint(1)',
+            'tinyInteger' => 'tinyint(1)',
+            'unsignedInteger' => 'int(10) unsigned',
+            'unsignedBigInteger' => 'bigint(20) unsigned',
+            'decimal:10,2' => 'decimal(10,2)',
+            'decimal:8,2' => 'decimal(8,2)', 
+            'decimal:3,2' => 'decimal(3,2)',
+            'decimal:5,2' => 'decimal(5,2)',
+            'json' => 'json',
+            'timestamp' => 'timestamp',
+            'enum:index,noindex,follow,nofollow' => "enum('index','noindex','follow','nofollow')"
+        ];
+        
+        return $typeMap[$type] ?? $type;
+    }
+
+    /**
+     * Add product indexes
+     */
+    protected function addProductIndexes()
+    {
+        $indexes = [
+            'products_slug_unique' => 'products(slug)',
+            'products_view_count_index' => 'products(view_count)',
+            'products_short_description_index' => 'products(short_description)',
+            'products_track_quantity_index' => 'products(track_quantity)'
+        ];
+
+        foreach ($indexes as $indexName => $columns) {
+            if (!$this->indexExists('products', $indexName)) {
+                DB::statement("CREATE INDEX `$indexName` ON products $columns");
+            }
+        }
+    }
+
+    /**
+     * Add category indexes  
+     */
+    protected function addCategoryIndexes()
+    {
+        $indexes = [
+            'categories_slug_unique' => 'categories(slug)',
+            'categories_parent_id_index' => 'categories(parent_id)',
+            'categories_sort_order_index' => 'categories(sort_order)',
+            'categories_is_featured_index' => 'categories(is_featured)',
+            'categories_active_index' => 'categories(active)'
+        ];
+
+        foreach ($indexes as $indexName => $columns) {
+            if (!$this->indexExists('categories', $indexName)) {
+                DB::statement("CREATE INDEX `$indexName` ON categories $columns");
+            }
+        }
+    }
+
+    /**
+     * Add brand indexes
+     */
+    protected function addBrandIndexes()
+    {
+        $indexes = [
+            'brands_slug_unique' => 'brands(slug)',
+            'brands_is_featured_index' => 'brands(is_featured)',
+            'brands_active_index' => 'brands(active)',
+            'brands_product_count_index' => 'brands(product_count)',
+            'brands_view_count_index' => 'brands(view_count)'
+        ];
+
+        foreach ($indexes as $indexName => $columns) {
+            if (!$this->indexExists('brands', $indexName)) {
+                DB::statement("CREATE INDEX `$indexName` ON brands $columns");
+            }
+        }
+    }
+
+    /**
+     * Add banner indexes
+     */
+    protected function addBannerIndexes()
+    {
+        $indexes = [
+            'banners_slug_unique' => 'banners(slug)',
+            'banners_is_active_index' => 'banners(is_active)',
+            'banners_sort_order_index' => 'banners(sort_order)',
+            'banners_campaign_index' => 'banners(campaign_name)',
+            'banners_last_viewed_index' => 'banners(last_viewed_at)'
+        ];
+
+        foreach ($indexes as $indexName => $columns) {
+            if (!$this->indexExists('banners', $indexName)) {
+                DB::statement("CREATE INDEX `$indexName` ON banners $columns");
+            }
+        }
+    }
+
+    /**
+     * Check if an index exists
+     */
+    protected function indexExists($table, $indexName)
+    {
+        $indexes = DB::select("SHOW INDEX FROM $table");
+        foreach ($indexes as $index) {
+            if ($index->Key_name === $indexName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        // Remove added columns (optional - can be commented out for safety)
+        // Schema::table('products', function (Blueprint $table) {
+        //     $table->dropColumn(['slug', 'short_description', 'compare_price', 'cost_per_item', 'track_quantity', 'continue_selling_when_out_of_stock', 'barcode', 'weight_unit', 'length', 'width', 'height', 'dimension_unit', 'custom_fields', 'view_count', 'product_count']);
+        // });
+        // 
+        // Schema::table('categories', function (Blueprint $table) {
+        //     $table->dropColumn(['slug', 'short_description', 'meta_title', 'meta_description', 'meta_keywords', 'breadcrumb_title', 'parent_breadcrumb_title', 'category_banner', 'category_tags', 'is_featured', 'show_on_homepage', 'sort_order', 'has_children', 'product_count', 'view_count', 'category_content', 'category_sidebar_content', 'category_video_url', 'og_title', 'og_description', 'og_image', 'og_type', 'schema_markup', 'url_structure', 'canonical_url', 'index_status', 'change_frequency', 'last_modified', 'created_by']);
+        // });
+        // 
+        // Schema::table('brands', function (Blueprint $table) {
+        //     $table->dropColumn(['slug', 'short_description', 'meta_title', 'meta_description', 'meta_keywords', 'brand_logo', 'brand_banner', 'brand_video_url', 'website_url', 'facebook_url', 'instagram_url', 'twitter_url', 'youtube_url', 'linkedin_url', 'contact_email', 'contact_phone', 'support_email', 'brand_type', 'is_featured', 'show_on_homepage', 'is_verified', 'is_premium', 'product_count', 'view_count', 'follower_count', 'rating_average', 'rating_count', 'country_of_origin', 'headquarters_address', 'established_year', 'brand_story', 'brand_values', 'brand_mission', 'brand_vision', 'og_title', 'og_description', 'og_image', 'og_type', 'schema_markup', 'url_structure', 'canonical_url', 'index_status', 'change_frequency', 'last_modified', 'custom_fields', 'created_by']);
+        // });
+        // 
+        // Schema::table('banners', function (Blueprint $table) {
+        //     $table->dropColumn(['slug', 'short_description', 'meta_title', 'meta_description', 'meta_keywords', 'banner_type', 'display_position', 'sort_order', 'is_featured', 'is_active', 'button_text', 'button_url', 'button_color', 'background_color', 'text_color', 'overlay_color', 'overlay_opacity', 'mobile_image', 'tablet_image', 'desktop_image', 'retina_image', 'video_url', 'video_poster', 'autoplay_video', 'loop_video', 'mute_video', 'display_duration', 'transition_duration', 'animation_type', 'easing_function', 'target_audience', 'display_conditions', 'device_targeting', 'location_targeting', 'campaign_name', 'click_count', 'view_count', 'click_through_rate', 'conversion_rate', 'start_date', 'end_date', 'display_schedule', 'show_on_mobile', 'show_on_tablet', 'show_on_desktop', 'tracking_id', 'analytics_data', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'og_title', 'og_description', 'og_image', 'og_type', 'schema_markup', 'custom_fields', 'banner_metadata', 'created_by', 'updated_by', 'last_viewed_at']);
+        // });
+    }
+};

@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+img, video {
+    max-width: 100%;
+}
+
+/* Fix #orderDetailsModal positioning - Tailwind preflight conflicts with Bootstrap modal */
+#orderDetailsModal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1055 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+#orderDetailsModal .modal-dialog {
+    position: relative;
+    margin: 1.75rem auto;
+    pointer-events: none;
+}
+
+#orderDetailsModal .modal-content {
+    position: relative;
+    pointer-events: auto;
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+#orderDetailsModal .modal-backdrop,
+#orderDetailsModal + .modal-backdrop {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    z-index: 1050 !important;
+    width: 100vw;
+    height: 100vh;
+}
+
+#orderDetailsModal .row > * {
+    position: static !important;
+}
