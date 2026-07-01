@@ -672,9 +672,7 @@ class ProductController extends Controller
             \Log::error('Image storage failed', ['error' => $e->getMessage()]);
             return null;
         }
-    }
-
-    public function downloadTemplate()
+     public function downloadTemplate()
     {
         $headers = [
             'Content-Type' => 'text/csv',
@@ -684,12 +682,12 @@ class ProductController extends Controller
         $callback = function() {
             $file = fopen('php://output', 'w');
             fputcsv($file, [
-                'name', 'category_name', 'brand_name', 'short_description', 'description', 
+                'name', 'category_id', 'brand_id', 'short_description', 'description', 
                 'weight', 'weight_unit', 'length', 'width', 'height', 'dimension_unit', 
                 'variant_value', 'variant_unit', 'variant_mrp', 'variant_stock', 'variant_sku'
             ]);
             fputcsv($file, [
-                'Wax polish', 'AUTO CARE', 'Molikule Green Care', 'Wax Polish enhances shine.', 'Wax Polish is a protective and polishing solution...', 
+                'Wax polish', '1', '1', 'Wax Polish enhances shine.', 'Wax Polish is a protective and polishing solution...', 
                 '5.25', 'kg', '20.00', '14.00', '31.98', 'cm', 
                 'Wox Polish', '5L', '2400.00', '50', 'A-WX-01'
             ]);
@@ -730,31 +728,24 @@ class ProductController extends Controller
                 $data = array_combine($header, $row);
                 
                 $name = isset($data['name']) ? trim($data['name']) : null;
-                $categoryName = isset($data['category_name']) ? trim($data['category_name']) : null;
-                $brandName = isset($data['brand_name']) ? trim($data['brand_name']) : null;
+                $categoryId = isset($data['category_id']) ? (int)trim($data['category_id']) : null;
+                $brandId = isset($data['brand_id']) ? (int)trim($data['brand_id']) : null;
                 
-                if (empty($name) || empty($categoryName) || empty($brandName)) {
+                if (empty($name) || empty($categoryId) || empty($brandId)) {
                     $skipped++;
                     continue;
                 }
 
-                // 1. Get or Create Category
-                $category = Category::firstOrCreate(
-                    ['category_name' => $categoryName],
-                    [
-                        'slug' => Str::slug($categoryName),
-                        'is_active' => true
-                    ]
-                );
+                // 1. Get Category
+                $category = Category::find($categoryId);
 
-                // 2. Get or Create Brand
-                $brand = Brand::firstOrCreate(
-                    ['brand_name' => $brandName],
-                    [
-                        'slug' => Str::slug($brandName),
-                        'is_active' => true
-                    ]
-                );
+                // 2. Get Brand
+                $brand = Brand::find($brandId);
+                
+                if (!$category || !$brand) {
+                    $skipped++;
+                    continue;
+                }
 
                 // Primary Variant fields
                 $variantValue = isset($data['variant_value']) ? trim($data['variant_value']) : '';
