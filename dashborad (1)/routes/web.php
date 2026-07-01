@@ -51,6 +51,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Product Management
     Route::get('products/download-template', [ProductController::class, 'downloadTemplate'])->name('products.download-template');
     Route::post('products/bulk-upload', [ProductController::class, 'bulkUpload'])->name('products.bulk-upload');
+    Route::post('products/{id}/upload-image-ajax', [ProductController::class, 'uploadImageAjax'])->name('products.upload-image-ajax');
     Route::resource('products', ProductController::class);
     Route::get('/low-stock', [ProductController::class, 'lowStock'])->name('products.low-stock');
     Route::get('/stocks', [ProductController::class, 'stocks'])->name('products.stocks');
@@ -108,6 +109,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('product-variants/bulk-upload', [ProductVariantController::class, 'bulkUpload'])->name('product-variants.bulk-upload');
     Route::get('product-variants/bulk-create', [ProductVariantController::class, 'bulkCreate'])->name('product-variants.bulk-create');
     Route::post('product-variants/bulk-store', [ProductVariantController::class, 'bulkStore'])->name('product-variants.bulk-store');
+    Route::post('product-variants/{id}/upload-image-ajax', [ProductVariantController::class, 'uploadImageAjax'])->name('product-variants.upload-image-ajax');
     Route::resource('product-variants', ProductVariantController::class)->parameters(['product-variant' => 'product_variant']);
     Route::post('product-variants/bulk-update', [ProductVariantController::class, 'bulkUpdate'])->name('product-variants.bulk-update');
     Route::post('product-variants/{product_variant}/toggle-status', [ProductVariantController::class, 'toggleStatus'])->name('product-variants.toggle-status');

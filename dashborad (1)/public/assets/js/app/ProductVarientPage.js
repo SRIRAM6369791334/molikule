@@ -114,9 +114,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             return gridjs.html(`<img src="${cell.image}" class="rounded shadow-sm" style="width:45px; height:45px; object-fit:cover; border: 1px solid #eee;">`);
                         } else {
                             return gridjs.html(`
-                                <a href="/product-variants/${cell.id}/edit" class="btn btn-sm btn-soft-success d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; padding: 0; font-size: 10px; line-height: 1.1; text-align: center; font-weight: 600; border: 1px dashed #28a745;">
+                                <button type="button" class="btn btn-sm btn-soft-success d-flex align-items-center justify-content-center instant-upload-variant-image-btn" data-id="${cell.id}" style="width: 45px; height: 45px; padding: 0; font-size: 10px; line-height: 1.1; text-align: center; font-weight: 600; border: 1px dashed #28a745;">
                                     <span>Add<br>Image</span>
-                                </a>
+                                </button>
                             `);
                         }
                     }
@@ -351,5 +351,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 Swal.fire("Error", errorMsg, "error");
             }
         });
+    });
+
+    // Instant variant image upload handler
+    $(document).on("click", ".instant-upload-variant-image-btn", function() {
+        const id = $(this).data("id");
+        const button = $(this);
+        
+        // Create temporary file input
+        const fileInput = $('<input type="file" accept="image/*" style="display:none;">');
+        $('body').append(fileInput);
+        
+        fileInput.on("change", function() {
+            const file = this.files[0];
+            if (!file) return;
+            
+            button.prop("disabled", true).html('<span>Uploading...</span>');
+            
+            const formData = new FormData();
+            formData.append("image", file);
+            
+            $.ajax({
+                url: `/product-variants/${id}/upload-image-ajax`,
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function(response) {
+                    Swal.fire("Success", response.message, "success");
+                    renderTable(response.variants || []);
+                },
+                error: function(xhr) {
+                    let msg = "Failed to upload image";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    Swal.fire("Error", msg, "error");
+                    button.prop("disabled", false).html('<span>Add<br>Image</span>');
+                },
+                complete: function() {
+                    fileInput.remove();
+                }
+            });
+        });
+        
+        fileInput.trigger("click");
     });
 });

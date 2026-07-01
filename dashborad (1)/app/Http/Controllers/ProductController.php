@@ -874,4 +874,28 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+    public function uploadImageAjax(Request $request, $id)
+    {
+        $request->validate([
+            'image' => 'required|image|max:5120',
+        ]);
+
+        $product = Product::findOrFail($id);
+        
+        if ($request->hasFile('image')) {
+            $path = $this->processAndStoreImage($request->file('image'), 'products');
+            if ($path) {
+                $product->update(['image' => $path]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product image uploaded successfully',
+                    'image_url' => asset('uploads/' . $path),
+                    'products' => Product::with(['category', 'brand'])->latest()->get()->values()
+                ]);
+            }
+        }
+
+        return response()->json(['success' => false, 'message' => 'Failed to store image'], 400);
+    }
 }

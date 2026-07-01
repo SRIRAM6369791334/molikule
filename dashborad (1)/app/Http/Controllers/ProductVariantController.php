@@ -792,4 +792,28 @@ class ProductVariantController extends Controller
             ], 500);
         }
     }
+
+    public function uploadImageAjax(Request $request, $id)
+    {
+        $request->validate([
+            'image' => 'required|image|max:5120',
+        ]);
+
+        $variant = ProductVariant::findOrFail($id);
+        
+        if ($request->hasFile('image')) {
+            $path = $this->processAndStoreImage($request->file('image'), 'variants/images');
+            if ($path) {
+                $variant->update(['variant_image' => $path]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Variant image uploaded successfully',
+                    'image_url' => asset('uploads/' . $path),
+                    'variants' => ProductVariant::with(['product.category', 'product.brand'])->latest()->take(100)->get()
+                ]);
+            }
+        }
+
+        return response()->json(['success' => false, 'message' => 'Failed to store image'], 400);
+    }
 }
