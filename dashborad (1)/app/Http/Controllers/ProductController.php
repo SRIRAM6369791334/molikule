@@ -722,10 +722,11 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             while (($row = fgetcsv($fileHandle)) !== false) {
-                // Check if row matches header count
-                if (count($row) !== count($header)) {
-                    $skipped++;
-                    continue;
+                // Adjust row elements count to match header elements count (in case Excel added extra columns/commas)
+                if (count($row) < count($header)) {
+                    $row = array_pad($row, count($header), '');
+                } elseif (count($row) > count($header)) {
+                    $row = array_slice($row, 0, count($header));
                 }
 
                 $data = array_combine($header, $row);
