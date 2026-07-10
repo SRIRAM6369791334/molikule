@@ -689,12 +689,10 @@ class ProductVariantController extends Controller
 
                 $productIdVal = $getVal(['product_id', 'product_i']);
                 $productId = $productIdVal !== null ? (int)$productIdVal : null;
-                
-                $variantSku = $getVal(['variant_sku', 'sku']) ?? '';
 
-                if (empty($productId) || empty($variantSku)) {
+                if (empty($productId)) {
                     $skipped++;
-                    $skipReasons[] = "Row " . ($inserted + $updated + $skipped) . ": product_id ({$productIdVal}) or variant_sku ({$variantSku}) is empty";
+                    $skipReasons[] = "Row " . ($inserted + $updated + $skipped) . ": product_id is empty";
                     continue;
                 }
 
@@ -715,6 +713,14 @@ class ProductVariantController extends Controller
                     $variantUnit = $matches[1] . 'ml';
                 } elseif (preg_match('/^(\d+)\s*(l|L)$/i', $variantUnitRaw, $matches)) {
                     $variantUnit = $matches[1] . 'L';
+                }
+
+                $variantSku = $getVal(['variant_sku', 'sku']) ?? '';
+                if (empty($variantSku)) {
+                    // Auto-generate unique SKU based on product, flavor/value, and unit
+                    $valuePart = !empty($variantValue) ? preg_replace('/[^A-Za-z0-9]/', '', $variantValue) : 'STANDARD';
+                    $unitPart = !empty($variantUnit) ? preg_replace('/[^A-Za-z0-9]/', '', $variantUnit) : 'UNIT';
+                    $variantSku = 'MOL-' . $productId . '-' . strtoupper($valuePart) . '-' . strtoupper($unitPart);
                 }
                 $variantMrpVal = $getVal(['variant_mrp', 'variant_mr']) ?? '0';
                 $variantStockVal = $getVal(['variant_stock', 'variant_st']) ?? '0';

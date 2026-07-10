@@ -783,15 +783,9 @@ class ProductController extends Controller
                 }
                 $variantMrpVal = $getVal(['variant_mrp', 'variant_mr']) ?? '0';
                 $variantStockVal = $getVal(['variant_stock', 'variant_st']) ?? '0';
-                $variantSku = $getVal(['variant_sku']) ?? '';
 
                 $variantMrp = (float)$variantMrpVal;
                 $variantStock = (int)$variantStockVal;
-
-                if (empty($variantSku)) {
-                    $skipped++;
-                    continue;
-                }
 
                 // 3. Create or Update Product
                 $product = Product::updateOrCreate(
@@ -815,6 +809,14 @@ class ProductController extends Controller
                         'slug' => Str::slug($name),
                     ]
                 );
+
+                $variantSku = $getVal(['variant_sku', 'sku']) ?? '';
+                if (empty($variantSku)) {
+                    // Auto-generate unique SKU based on product, flavor/value, and unit
+                    $valuePart = !empty($variantValue) ? preg_replace('/[^A-Za-z0-9]/', '', $variantValue) : 'STANDARD';
+                    $unitPart = !empty($variantUnit) ? preg_replace('/[^A-Za-z0-9]/', '', $variantUnit) : 'UNIT';
+                    $variantSku = 'MOL-' . $product->product_id . '-' . strtoupper($valuePart) . '-' . strtoupper($unitPart);
+                }
 
                 // 4. Create or Update the first Variant
                 $variantName = ($variantValue && $variantUnit) ? ($variantValue . ' – ' . $variantUnit) : ($variantValue ?: ($variantUnit ?: 'Standard'));
