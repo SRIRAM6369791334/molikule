@@ -56,7 +56,10 @@ const renderGrid = (brands) => {
         columns: [
             "S.NO",
             "Brand ID",
-            "Brand Name",
+            {
+                name: "Brand Name",
+                formatter: (cell) => gridjs.html(`<div class="text-truncate" style="max-width: 250px;" title="${cell}">${cell}</div>`)
+            },
             {
                 name: "Logo",
                 formatter: (cell, row) => {

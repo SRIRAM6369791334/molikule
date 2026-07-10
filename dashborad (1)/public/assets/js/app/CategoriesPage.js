@@ -149,7 +149,10 @@ const renderGrid = (categories) => {
         columns: [
             "S.NO",
             "Category ID",
-            "Category Name",
+            {
+                name: "Category Name",
+                formatter: (cell) => gridjs.html(`<div class="text-truncate" style="max-width: 250px;" title="${cell}">${cell}</div>`)
+            },
             {
                 name: "Category Image",
                 formatter: (cell, row) => {

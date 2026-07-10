@@ -86,16 +86,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 3. GridJS Implementation (100% Sync with Kumarimall UI)
-    const mapVariantToRow = (v) => [
-        { image: v.variant_image, id: v.id },
-        gridjs.html(`<div class="fw-bold text-primary">${v.variant_name || `${v.value} ${v.variant_unit || ''}`}</div><small class="text-muted">SKU: ${v.sku || 'N/A'}</small>`),
-        gridjs.html(`<div class="fw-semibold">${v.product ? v.product.name : 'Unknown'}</div>`),
-        v.product && v.product.brand ? v.product.brand.brand_name : 'N/A',
-        v.product && v.product.category ? v.product.category.category_name : 'N/A',
-        { mrp: v.mrp_price, offer: v.discounted_price },
-        v.stock_quantity,
-        v.id
-    ];
+    const mapVariantToRow = (v) => {
+        const variantName = v.variant_name || `${v.value} ${v.variant_unit || ''}`;
+        const productName = v.product ? v.product.name : 'Unknown';
+        const brandName = v.product && v.product.brand ? v.product.brand.brand_name : 'N/A';
+        const categoryName = v.product && v.product.category ? v.product.category.category_name : 'N/A';
+        
+        return [
+            { image: v.variant_image, id: v.id },
+            gridjs.html(`<div class="fw-bold text-primary text-truncate" style="max-width: 180px;" title="${variantName}">${variantName}</div><small class="text-muted">SKU: ${v.sku || 'N/A'}</small>`),
+            gridjs.html(`<div class="fw-semibold text-truncate" style="max-width: 160px;" title="${productName}">${productName}</div>`),
+            gridjs.html(`<div class="text-truncate" style="max-width: 110px;" title="${brandName}">${brandName}</div>`),
+            gridjs.html(`<div class="text-truncate" style="max-width: 110px;" title="${categoryName}">${categoryName}</div>`),
+            { mrp: v.mrp_price, offer: v.discounted_price },
+            v.stock_quantity,
+            v.id
+        ];
+    };
 
     const renderTable = (variants = []) => {
         if (productGrid) {
