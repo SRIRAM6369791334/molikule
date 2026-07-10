@@ -657,6 +657,7 @@ class ProductVariantController extends Controller
         $inserted = 0;
         $updated = 0;
         $skipped = 0;
+        $skipReasons = [];
 
         DB::beginTransaction();
         try {
@@ -693,6 +694,7 @@ class ProductVariantController extends Controller
 
                 if (empty($productId) || empty($variantSku)) {
                     $skipped++;
+                    $skipReasons[] = "Row " . ($inserted + $updated + $skipped) . ": product_id ({$productIdVal}) or variant_sku ({$variantSku}) is empty";
                     continue;
                 }
 
@@ -700,6 +702,7 @@ class ProductVariantController extends Controller
                 $product = Product::find($productId);
                 if (!$product) {
                     $skipped++;
+                    $skipReasons[] = "Row " . ($inserted + $updated + $skipped) . ": Product ID {$productId} not found in database";
                     continue;
                 }
 
@@ -776,9 +779,15 @@ class ProductVariantController extends Controller
             fclose($fileHandle);
             DB::commit();
 
+            $msg = "Bulk upload complete. Created: $inserted, Updated: $updated, Skipped: $skipped";
+            if (!empty($skipReasons)) {
+                $msg .= ". Skip Reasons: " . implode(" | ", array_slice($skipReasons, 0, 3));
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => "Bulk upload complete. Created: $inserted, Updated: $updated, Skipped: $skipped",
+                'message' => $msg,
+                'skip_reasons' => $skipReasons,
                 'variants' => ProductVariant::with(['product.category', 'product.brand'])->latest()->take(100)->get()
             ]);
 
