@@ -340,7 +340,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Refresh table grid
                 renderTable(response.variants || []);
-                Swal.fire("Success", response.message, "success");
+                
+                const created = response.created_count !== undefined ? parseInt(response.created_count) : 0;
+                const updated = response.updated_count !== undefined ? parseInt(response.updated_count) : 0;
+                
+                if (created === 0 && updated === 0) {
+                    Swal.fire("Upload Skipped", response.message, "warning");
+                } else {
+                    Swal.fire("Success", response.message, "success");
+                }
             },
             error: function (jqXHR) {
                 submitBtn.removeAttr("disabled").html("Start Upload");

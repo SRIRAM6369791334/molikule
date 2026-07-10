@@ -863,6 +863,9 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => "Bulk upload complete. Created: $inserted, Updated: $updated, Skipped: $skipped",
+                'created_count' => $inserted,
+                'updated_count' => $updated,
+                'skipped_count' => $skipped,
                 'products' => Product::with(['category', 'brand'])->latest()->get()->values()
             ]);
 

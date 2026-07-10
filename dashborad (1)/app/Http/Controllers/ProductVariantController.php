@@ -793,6 +793,9 @@ class ProductVariantController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $msg,
+                'created_count' => $inserted,
+                'updated_count' => $updated,
+                'skipped_count' => $skipped,
                 'skip_reasons' => $skipReasons,
                 'variants' => ProductVariant::with(['product.category', 'product.brand'])->latest()->take(100)->get()
             ]);
