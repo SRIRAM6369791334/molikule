@@ -70,7 +70,7 @@ function renderProductGrid(products, wrapper) {
                             ${imageHtml}
                             <div style="line-height: 1.2;">
                                 <h6 class="text-truncate mb-1" style="max-width: 180px; font-weight: 600;">${cell}</h6>
-                                <span class="badge bg-soft-info text-info small" style="font-size: 10px;">${category}</span>
+                                <span class="badge bg-soft-info text-info small d-inline-block text-truncate" style="max-width: 180px; font-size: 10px; vertical-align: bottom;">${category}</span>
                             </div>
                         </div>
                     `);
