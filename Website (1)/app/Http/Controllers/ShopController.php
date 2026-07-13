@@ -219,6 +219,7 @@ class ShopController extends Controller
                 'mrp_price'  => (float) $variant->mrp_price,
                 'stock'      => $variant->stock_quantity,
                 'image'      => $variant->variant_image_full_url,
+                'gallery'    => $variant->variant_gallery_images_urls,
                 'label'      => $variant->variant_label,
             ];
         }

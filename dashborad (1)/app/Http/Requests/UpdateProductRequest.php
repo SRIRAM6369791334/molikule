@@ -42,7 +42,7 @@ class UpdateProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,category_id',
             'brand_id' => 'required|exists:brands,brand_id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120|dimensions:width=1080,height=1080',
-            'gallery_images'   => 'nullable|array',
+            'gallery_images'   => 'nullable|array|max:4',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120|dimensions:width=1080,height=1080',
             'low_stock_threshold' => 'nullable|integer|min:0',
             'part_number' => 'nullable|string|max:100',

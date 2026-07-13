@@ -62,6 +62,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/products-filter-stats', [ProductController::class, 'filterStats'])->name('products.filter-stats');
     Route::post('/products/bulk-update', [ProductController::class, 'bulkUpdate'])->name('products.bulk-update');
     Route::post('/products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
+    Route::post('/products/{product}/delete-gallery-image', [ProductController::class, 'deleteGalleryImage'])->name('products.delete-gallery-image');
 
     Route::get('categories/download-template', [CategoryController::class, 'downloadTemplate'])->name('categories.download-template');
     Route::post('categories/bulk-upload', [CategoryController::class, 'bulkUpload'])->name('categories.bulk-upload');

@@ -93,7 +93,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const categoryName = v.product && v.product.category ? v.product.category.category_name : 'N/A';
         
         return [
-            { image: v.variant_image, id: v.id },
+            { 
+                variant_image: v.variant_image, 
+                main_image: v.main_image, 
+                id: v.id 
+            },
             gridjs.html(`<div class="fw-bold text-primary text-truncate" style="max-width: 180px;" title="${variantName}">${variantName}</div><small class="text-muted">SKU: ${v.sku || 'N/A'}</small>`),
             gridjs.html(`<div class="fw-semibold text-truncate" style="max-width: 160px;" title="${productName}">${productName}</div>`),
             gridjs.html(`<div class="text-truncate" style="max-width: 110px;" title="${brandName}">${brandName}</div>`),
@@ -116,9 +120,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     name: "Image",
                     width: "90px",
                     formatter: (cell) => {
-                        const hasImage = cell.image && cell.image !== '';
-                        if (hasImage) {
-                            return gridjs.html(`<img src="${cell.image}" class="rounded shadow-sm" style="width:45px; height:45px; object-fit:cover; border: 1px solid #eee;">`);
+                        const hasCustomImage = cell.variant_image && cell.variant_image !== '';
+                        const imageToDisplay = cell.main_image;
+                        if (imageToDisplay && !imageToDisplay.includes('img-1.png')) {
+                            let html = `<div class="position-relative d-inline-block rounded" style="width:45px; height:45px;">
+                                <img src="${imageToDisplay}" class="rounded shadow-sm" style="width:45px; height:45px; object-fit:cover; border: 1px solid #eee; ${!hasCustomImage ? 'opacity: 0.8;' : ''}">`;
+                            if (!hasCustomImage) {
+                                html += `
+                                    <button type="button" class="btn btn-sm btn-success p-0 position-absolute bottom-0 end-0 rounded-circle d-flex align-items-center justify-content-center instant-upload-variant-image-btn" data-id="${cell.id}" style="width: 16px; height: 16px; font-size: 10px; line-height: 1; border: 1px solid #fff; z-index: 5;" title="Upload custom variant image">
+                                        <i class="mdi mdi-plus"></i>
+                                    </button>
+                                `;
+                            }
+                            html += `</div>`;
+                            return gridjs.html(html);
                         } else {
                             return gridjs.html(`
                                 <button type="button" class="btn btn-sm btn-soft-success d-flex align-items-center justify-content-center instant-upload-variant-image-btn" data-id="${cell.id}" style="width: 45px; height: 45px; padding: 0; font-size: 10px; line-height: 1.1; text-align: center; font-weight: 600; border: 1px dashed #28a745;">
@@ -275,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
             div.innerHTML = `
                 <div class="row align-items-center">
                     <div class="col-md-9">
-                        <input type="file" class="form-control" name="product_image1[]" accept="image/*">
+                        <input type="file" class="form-control" name="variant_gallery[]" accept="image/*">
                     </div>
                     <div class="col-md-3">
                         <button type="button" class="btn btn-danger btn-sm delete-input1">Delete</button>

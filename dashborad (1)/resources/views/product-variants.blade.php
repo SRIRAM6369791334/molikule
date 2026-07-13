@@ -255,7 +255,7 @@
                                     <div class="product_fields1 mb-3">
                                         <div class="row align-items-center">
                                             <div class="col-md-9">
-                                                <input type="file" class="form-control" name="product_image1[]" accept="image/*">
+                                                <input type="file" class="form-control" name="variant_gallery[]" accept="image/*">
                                             </div>
                                             <div class="col-md-3">
                                                 <button type="button" class="btn btn-danger btn-sm delete-input1">Delete</button>

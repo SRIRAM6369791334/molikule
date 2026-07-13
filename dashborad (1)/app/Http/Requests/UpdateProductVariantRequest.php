@@ -41,6 +41,8 @@ class UpdateProductVariantRequest extends FormRequest
             'discount_type'  => 'nullable|in:percentage,flat',
             'discount_value' => 'nullable|numeric|min:0',
             'sku'            => ['required', 'string', 'max:100', Rule::unique('product_variants', 'sku')->ignore($variantId)],
+            'variant_gallery'   => 'nullable|array|max:4',
+            'variant_gallery.*' => 'image|max:5120',
         ];
     }
 }

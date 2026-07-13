@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Molikule Enterprise Admin Dashboard - Complete User Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #2D3748;
+    line-height: 1.6;
+    font-size: 13.5px;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1A202C;
+    border-bottom: 2px solid #BBd700;
+    padding-bottom: 12px;
+    margin-top: 0;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1A202C;
+    margin-top: 28px;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #E2E8F0;
+    page-break-after: avoid;
+  }
+  
+  .section-header {
+    page-break-before: always;
+  }
+  
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4A5568;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  
+  p {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #4D5562;
+    text-align: justify;
+  }
+  
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding-left: 20px;
+  }
+  
+  li {
+    margin-bottom: 6px;
+    color: #4D5562;
+  }
+  
+  li strong {
+    color: #2D3748;
+  }
+  
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    margin-bottom: 20px;
+    font-size: 12.5px;
+    page-break-inside: avoid;
+  }
+  
+  th, td {
+    border: 1px solid #CBD5E0;
+    padding: 8px 10px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #EDF2F7;
+    font-weight: 600;
+    color: #2D3748;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #F7FAFC;
+  }
+  
+  hr {
+    border: 0;
+    height: 1px;
+    background: #E2E8F0;
+    margin: 24px 0;
+  }
+  
+  /* Alert Box Styles */
+  .alert {
+    padding: 10px 14px;
+    margin: 14px 0;
+    border-left: 4px solid;
+    border-radius: 4px;
+    font-size: 13px;
+    page-break-inside: avoid;
+  }
+  
+  .alert-important {
+    border-left-color: #E53E3E;
+    background-color: #FFF5F5;
+    color: #9B2C2C;
+  }
+  
+  .alert-note {
+    border-left-color: #3182CE;
+    background-color: #EBF8FF;
+    color: #2B6CB0;
+  }
+  
+  /* Sidebar reference table */
+  ul.sidebar-list {
+    list-style: none;
+    padding-left: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  
+  ul.sidebar-list li {
+    background: #F7FAFC;
+    border: 1px solid #E2E8F0;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-bottom: 0;
+    font-size: 12.5px;
+  }
+</style>
+</head>
+<body>
+<h1>Molikule Enterprise Admin Dashboard - Complete User Guide</h1>
+<p>Welcome to the <strong>Molikule Enterprise Admin Dashboard User Guide</strong>. This document explains how to use each section of the admin panel step-by-step in simple English.</p>
+<p>To help you navigate easily, <strong>all sections in this guide use the exact names shown in your left sidebar menu.</strong></p>
+<hr />
+<h2 class="section-header">Sidebar Navigation Menu Reference</h2>
+<p>Here is the mapping of sidebar names to their functions:</p>
+<ul>
+<li><strong>Dashboard</strong>: Main stats screen.</li>
+<li><strong>Home Banners</strong>: Manage the main sliders (1521x580px).</li>
+<li><strong>Banners</strong>: Manage the homepage grid promo cards (Bento Cards).</li>
+<li><strong>Certificates</strong>: Manage ISO and trust certifications.</li>
+<li><strong>Customers</strong>: View website customer profiles (Read-Only).</li>
+<li><strong>Brands</strong>: Register brand names and logos.</li>
+<li><strong>Categories</strong>: Organize products into groupings.</li>
+<li><strong>All Products</strong>: List, add, or bulk upload your products.</li>
+<li><strong>Product Variants</strong>: Add size, volume, and scent variations.</li>
+<li><strong>Stock Management</strong>: Manage product stock and inventory levels.</li>
+<li><strong>All Orders</strong>: View every order placed on the website.</li>
+<li><strong>Pending Orders</strong>: Orders awaiting verification.</li>
+<li><strong>Processing Orders</strong>: Orders currently being packed.</li>
+<li><strong>In-Transit</strong>: Shipped orders on their way to customers.</li>
+<li><strong>Delivered</strong>: Successfully completed orders.</li>
+<li><strong>Discount Coupons</strong>: Create promo discount codes.</li>
+<li><strong>Blog Manager</strong>: Write and publish blog articles.</li>
+<li><strong>Product Reviews</strong>: Approve or delete customer reviews.</li>
+<li><strong>Contact Messages</strong>: Read messages sent via the contact form.</li>
+<li><strong>NEXUS Enquiries</strong>: View NEXUS certification requests.</li>
+<li><strong>Job Applications</strong>: View candidate resumes and details.</li>
+<li><strong>Open Positions</strong>: Post hiring vacancies.</li>
+</ul>
+<hr />
+<h2 class="section-header">1. Login and Dashboard Overview</h2>
+<h3>How to Log In</h3>
+<ol>
+<li>Open your web browser and go to the admin login page (e.g., <code>yourdomain.com/login</code>).</li>
+<li>Enter your registered <strong>Email Address</strong> and <strong>Password</strong>.</li>
+<li>Click the <strong>Log In</strong> button.</li>
+<li>If successful, you will be redirected to the main Dashboard page.
+<ul>
+<li><em>Note: Only accounts with Admin privileges can log in.</em></li>
+</ul>
+</li>
+</ol>
+<h3>Dashboard Overview</h3>
+<ul>
+<li><strong>Stats Cards</strong>: Displays quick counts of total orders, pending orders, processing orders, and today's orders.</li>
+<li><strong>Navigation Bar</strong>: Located on the left side of the screen. Use this menu to navigate to different sections of the admin panel.</li>
+</ul>
+<hr />
+<h2 class="section-header">2. Interactive Tables (Grid.js)</h2>
+<p>The dashboard uses modern interactive tables (<strong>Grid.js</strong>) to list brands, categories, products, and orders.</p>
+<h3>Key Table Features</h3>
+<ul>
+<li><strong>Search Field</strong>: Type keywords in the search bar to filter rows instantly.</li>
+<li><strong>Result Filters</strong>: Drop-down menus to filter items by Brand, Category, or Status.</li>
+<li><strong>Clear Filter Button</strong>: Click to reset the search instantly.</li>
+<li><strong>Pagination</strong>: Click the page numbers at the bottom of the table to navigate through items.</li>
+<li><strong>Sorting</strong>: Click any column header to sort the table rows in ascending or descending order.</li>
+</ul>
+<hr />
+<h2 class="section-header">3. Global Search and Suggestions</h2>
+<p>Located at the top header of the admin panel is the <strong>Global Search Bar</strong>. This is a powerful, instant lookup tool.</p>
+<h3>How to Search</h3>
+<ol>
+<li>Click on the search bar at the top header of the screen.</li>
+<li>Start typing a keyword (e.g., a product name, category title, or brand name).</li>
+<li>Review the instant drop-down list of suggestions matching your keyword.</li>
+<li>Click on any item in the suggestion list to navigate directly to its edit form.</li>
+</ol>
+<hr />
+<h2 class="section-header">4. Home Banners</h2>
+<p>Use this section to manage the slide banners that display on the main page of your website.</p>
+<div class="alert alert-important"><strong>Banner Limit</strong>: You can have a maximum of <strong>6 active banners</strong> at any time. If you already have 6 banners, the <strong>Create Banner</strong> button is disabled. You must delete an existing banner before creating a new one.</div>
+<h3>How to Add (Create) a Banner</h3>
+<ol>
+<li>Click <strong>Home Banners</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Create New Banner</strong> button at the top right of the page.</li>
+<li>Upload the <strong>Banner Image</strong> (Must be exactly <strong>1521 x 580 pixels</strong> and under <strong>5 MB</strong>).</li>
+<li>Click the <strong>Create Banner</strong> button.</li>
+<li>If successful, a green success message will appear, and the banner will go live.</li>
+</ol>
+<h3>How to Edit a Banner</h3>
+<ol>
+<li>Go to the <strong>Home Banners</strong> list page.</li>
+<li>Locate the banner you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Upload a new image in the upload area.</li>
+<li>Click <strong>Update Banner</strong>.</li>
+</ol>
+<h3>How to Toggle Status (Activate / Inactivate)</h3>
+<ol>
+<li>On the <strong>Home Banners</strong> list, locate the toggle switch next to each banner.</li>
+<li>Click the switch to toggle between <strong>Active</strong> (visible on website) and <strong>Inactive</strong> (hidden).</li>
+</ol>
+<h3>How to Delete a Banner</h3>
+<ol>
+<li>On the <strong>Home Banners</strong> list, click the <strong>Delete</strong> (trash icon) button next to the banner.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<hr />
+<h2 class="section-header">5. Banners (Bento Cards)</h2>
+<p>Use this section to manage the grid promotional cards shown on the home page.</p>
+<h3>How to Add a Bento Card</h3>
+<ol>
+<li>Click <strong>Banners</strong> (the second one in the sidebar) in the left sidebar menu.</li>
+<li>Click the <strong>Add Bento Card</strong> button at the top right of the page.</li>
+<li>Upload the <strong>Image</strong> (Must be under <strong>5 MB</strong>).</li>
+<li>Toggle the <strong>Publish (Active)</strong> switch to make it live.</li>
+<li>Click <strong>Save Bento Card</strong>.</li>
+</ol>
+<h3>How to Edit a Bento Card</h3>
+<ol>
+<li>Go to the <strong>Banners</strong> list page.</li>
+<li>Locate the card you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify the image or settings.</li>
+<li>Click <strong>Save Bento Card</strong>.</li>
+</ol>
+<h3>How to Delete a Bento Card</h3>
+<ol>
+<li>On the <strong>Banners</strong> list, click the <strong>Delete</strong> (trash icon) button next to the bento card.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<hr />
+<h2 class="section-header">6. Certificates</h2>
+<p>Use this section to add trust seals (like ISO certifications) that display on the footer or sidebar of the website.</p>
+<h3>How to Add a Certificate</h3>
+<ol>
+<li>Click <strong>Certificates</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Add Certificate</strong> button at the top right of the page.</li>
+<li>Enter the <strong>Certificate Title</strong> (e.g., <em>ISO 9001:2015 Certified</em>).</li>
+<li>Upload the <strong>Certificate Image</strong> (Must be under <strong>5 MB</strong>).</li>
+<li>Set the toggle to <strong>Active (visible on website)</strong>.</li>
+<li>Click <strong>Save Certificate</strong>.</li>
+</ol>
+<h3>How to Edit a Certificate</h3>
+<ol>
+<li>Go to the <strong>Certificates</strong> list page.</li>
+<li>Locate the certificate you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify the title, image, or active status.</li>
+<li>Click <strong>Save Certificate</strong>.</li>
+</ol>
+<h3>How to Delete a Certificate</h3>
+<ol>
+<li>On the <strong>Certificates</strong> list, click the <strong>Delete</strong> (trash icon) button next to the certificate.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<hr />
+<h2 class="section-header">7. Customers (Read-Only)</h2>
+<p>Use this section to view registered storefront customer accounts.</p>
+<h3>How to View Customers</h3>
+<ol>
+<li>Click <strong>Customers</strong> in the left sidebar menu.</li>
+<li>Review the list of registered customer accounts.</li>
+<li>Click the <strong>View</strong> (eye icon) button next to a customer to see detailed customer profile data, transaction history, and associated shipping addresses.</li>
+</ol>
+<hr />
+<h2 class="section-header">8. Brands</h2>
+<p>Use this section to manage the manufacturer names or brand labels.</p>
+<h3>How to Add (Register) a Brand</h3>
+<ol>
+<li>Click <strong>Brands</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Add Brand</strong> button at the top right of the page.</li>
+<li>Enter the <strong>Brand Name</strong>.</li>
+<li>Upload the <strong>Brand Logo</strong> (Must be exactly <strong>1024 x 1024 pixels</strong> and under <strong>5 MB</strong>).</li>
+<li>Switch the toggle to active so products under this brand can be displayed.</li>
+<li>Check <strong>Featured Brand</strong> if you want to highlight this brand on the homepage.</li>
+<li>Click <strong>Register Brand</strong>.</li>
+</ol>
+<h3>How to Edit a Brand</h3>
+<ol>
+<li>Go to the <strong>Brands</strong> list page.</li>
+<li>Locate the brand you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify the brand name, logo, or settings.</li>
+<li>Click <strong>Update Brand</strong>.</li>
+</ol>
+<h3>How to Delete a Brand</h3>
+<ol>
+<li>On the <strong>Brands</strong> list, click the <strong>Delete</strong> (trash icon) button next to the brand.</li>
+<li>Confirm the delete request in the popup.
+<ul>
+<li><em>Note: The system will block deletion if any active product is currently assigned to this brand.</em></li>
+</ul>
+</li>
+</ol>
+<h3>Brand Bulk Upload CSV Format</h3>
+<ol>
+<li>Click <strong>Bulk Upload</strong> and click <strong>Download Template</strong> (<code>brands_template.csv</code>).</li>
+<li>Fill in the column:</li>
+</ol>
+<p>| CSV Column Header | Description | Example Value |
+| :--- | :--- | :--- |
+| <code>brand_name</code> | Name of the brand | <em>Molikule Pro</em> |</p>
+<ol start="3">
+<li>Save and upload.</li>
+</ol>
+<hr />
+<h2 class="section-header">9. Categories</h2>
+<p>Use categories to group your products (e.g., &quot;Home Care&quot;, &quot;Automotive Care&quot;).</p>
+<h3>How to Add a Category</h3>
+<ol>
+<li>Click <strong>Categories</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Add Category</strong> button at the top right of the page.</li>
+<li>Enter the <strong>Category Name</strong>.</li>
+<li>Upload the <strong>Category Cover Image</strong> (recommended size is <strong>512 x 512 pixels</strong>).</li>
+<li>Toggle on the active status.</li>
+<li><strong>Theme Settings (Optional)</strong>: Set custom colors, border styles, and backgrounds for the category landing page.</li>
+<li>Click <strong>Submit</strong>.</li>
+</ol>
+<h3>How to Edit a Category</h3>
+<ol>
+<li>Go to the <strong>Categories</strong> list page.</li>
+<li>Locate the category you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify the name, image, status, or theme settings.</li>
+<li>Click <strong>Submit</strong>.</li>
+</ol>
+<h3>How to Delete a Category</h3>
+<ol>
+<li>On the <strong>Categories</strong> list, click the <strong>Delete</strong> (trash icon) button next to the category.</li>
+<li>Confirm the delete request in the popup.
+<ul>
+<li><em>Note: The system will block deletion if any active product is currently assigned to this category.</em></li>
+</ul>
+</li>
+</ol>
+<h3>Category Bulk Upload CSV Format</h3>
+<ol>
+<li>Click <strong>Bulk Upload</strong> and click <strong>Download Template</strong> (<code>categories_template.csv</code>).</li>
+<li>Fill in the column:</li>
+</ol>
+<p>| CSV Column Header | Description | Example Value |
+| :--- | :--- | :--- |
+| <code>category_name</code> | Name of the category | <em>Floor Cleaners</em> |</p>
+<ol start="3">
+<li>Save and upload.</li>
+</ol>
+<hr />
+<h2 class="section-header">10. All Products</h2>
+<p>Use this section to list new products and upload products in bulk.</p>
+<h3>How to Add (Launch) a Product</h3>
+<ol>
+<li>Click <strong>All Products</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Launch New Product</strong> button at the top right of the page.</li>
+<li><strong>Step 1: General Details</strong>: Enter the name, select category/brand, upload the main image (Must be exactly <strong>1080 x 1080 pixels</strong>), upload gallery images, and enter descriptions. Click <strong>Next: Inventory</strong>.</li>
+<li><strong>Step 2: Base Inventory &amp; Pricing</strong>: Enter flavor/scent, size/volume, MRP, discount values, initial stock quantity, and unique SKU. Click <strong>Next: Shipping</strong>.</li>
+<li><strong>Step 3: Shipping &amp; Status</strong>: Enter package weight, length, width, height dimensions, set status to Active, and toggle Popular Pick if desired.</li>
+<li>Click <strong>Submit</strong>.</li>
+</ol>
+<h3>How to Edit a Product</h3>
+<ol>
+<li>Go to the <strong>All Products</strong> list page.</li>
+<li>Locate the product you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify any of the fields in the multi-step form.</li>
+<li>Click <strong>Submit</strong>.</li>
+</ol>
+<h3>How to Delete a Product</h3>
+<ol>
+<li>On the <strong>All Products</strong> list, click the <strong>Delete</strong> (trash icon) button next to the product.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<h3>Product Bulk Upload CSV Format</h3>
+<ol>
+<li>Click <strong>Bulk Upload</strong> and click <strong>Download Template</strong> (<code>products_template.csv</code>).</li>
+<li>Fill in the template using the exact column headers below:</li>
+</ol>
+<p>| CSV Column Header | Description | Example Value |
+| :--- | :--- | :--- |
+| <code>name</code> | Name of the product | <em>Wax polish</em> |
+| <code>category_id</code> | Database ID of the Category | <em>1</em> |
+| <code>brand_id</code> | Database ID of the Brand | <em>1</em> |
+| <code>short_description</code> | Short summary line | <em>Wax Polish enhances shine.</em> |
+| <code>description</code> | Full usage details | <em>Wax Polish is a protective...</em> |
+| <code>weight</code> | Package weight value | <em>5.25</em> |
+| <code>weight_unit</code> | Unit: <code>kg</code> or <code>g</code> | <em>kg</em> |
+| <code>length</code> | Package length | <em>20.00</em> |
+| <code>width</code> | Package width | <em>14.00</em> |
+| <code>height</code> | Package height | <em>31.98</em> |
+| <code>dimension_unit</code> | Unit: <code>cm</code> or <code>mm</code> | <em>cm</em> |
+| <code>variant_value</code> | Scent/Flavor of first variant | <em>Wax Polish Scent</em> |
+| <code>variant_unit</code> | Size/Volume of first variant | <em>5L</em> |
+| <code>variant_mrp</code> | Original MRP price | <em>2400.00</em> |
+| <code>variant_stock</code> | Initial stock quantity | <em>50</em> |
+| <code>variant_sku</code> | Unique SKU code | <em>A-WX-01</em> |</p>
+<ol start="3">
+<li>Save and upload.</li>
+</ol>
+<hr />
+<h2 class="section-header">11. Product Variants</h2>
+<p>Use this section to add size, volume, and scent variations to your products.</p>
+<h3>How to Add a Product Variant</h3>
+<ol>
+<li>Click <strong>Product Variants</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Add Variant</strong> button at the top right of the page.</li>
+<li>Select the parent brand, category, and product.</li>
+<li>Upload the <strong>Variant Main Image</strong> (recommended size is <strong>600 x 600 pixels</strong>).</li>
+<li>Enter the flavor name/scent, SKU, unit type, quantity value, MRP, selling price, and stock quantity.</li>
+<li>Click <strong>Save Variant</strong>.</li>
+</ol>
+<h3>How to Edit a Product Variant</h3>
+<ol>
+<li>Go to the <strong>Product Variants</strong> list page.</li>
+<li>Locate the variant you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify the pricing, stock levels, images, or status.</li>
+<li>Click <strong>Save Variant</strong>.</li>
+</ol>
+<h3>How to Delete a Product Variant</h3>
+<ol>
+<li>On the <strong>Product Variants</strong> list, click the <strong>Delete</strong> (trash icon) button next to the variant.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<h3>Variant Bulk Upload CSV Format</h3>
+<ol>
+<li>Click <strong>Bulk Upload</strong> and click <strong>Download Template</strong> (<code>variants_template.csv</code>).</li>
+<li>Fill in the template using the exact column headers below:</li>
+</ol>
+<p>| CSV Column Header | Description | Example Value |
+| :--- | :--- | :--- |
+| <code>product_id</code> | Database ID of the parent Product | <em>1</em> |
+| <code>variant_value</code> | Scent/Flavor of this variant | <em>Wax Polish Scent</em> |
+| <code>variant_unit</code> | Size/Volume (e.g. 500ml, 5L) | <em>5L</em> |
+| <code>variant_mrp</code> | Original MRP price | <em>2400.00</em> |
+| <code>variant_stock</code> | Initial stock quantity | <em>50</em> |
+| <code>variant_sku</code> | Unique SKU code | <em>A-WX-01</em> |</p>
+<ol start="3">
+<li>Save and upload.</li>
+</ol>
+<hr />
+<h2 class="section-header">12. Stock Management</h2>
+<p>Use this section to check, edit, and keep track of all stock counts.</p>
+<h3>How to Adjust Stock Quantity</h3>
+<ol>
+<li>Click <strong>Stock Management</strong> in the left sidebar menu.</li>
+<li>Locate the product or variant you want to adjust.</li>
+<li>Enter the new stock count directly inside the input field in the table.</li>
+<li>Click the save button next to the input to update the quantity instantly.</li>
+</ol>
+<hr />
+<h2 class="section-header">13. Order Management</h2>
+<p>Use these sections in the sidebar (<strong>Pending Orders</strong>, <strong>Processing Orders</strong>, <strong>In-Transit</strong>, <strong>Delivered</strong>, and <strong>All Orders</strong>) to track and process customer purchases.</p>
+<h3>How to Update Order Status</h3>
+<ol>
+<li>Click any orders page (e.g., <strong>Pending Orders</strong> or <strong>All Orders</strong>) in the left sidebar menu.</li>
+<li>Locate the order you want to update and click its details page.</li>
+<li>Use the action dropdown to transition the order:
+<ul>
+<li>Select <strong>Processing</strong> when you begin packing. (Triggers an email notification).</li>
+<li>Select <strong>Dispatched</strong> when handing over to the courier. (Triggers an email notification; order moves to <strong>In-Transit</strong>).</li>
+<li>Select <strong>Delivered</strong> when the customer receives it. (Triggers an email notification; order moves to <strong>Delivered</strong>).</li>
+<li>Select <strong>Cancelled</strong> to cancel the order and return stock back to inventory.</li>
+</ul>
+</li>
+</ol>
+<h3>How to View, Print, or Download an Invoice</h3>
+<ol>
+<li>Go to any order details page.</li>
+<li>Click the <strong>Invoice</strong> action button:
+<ul>
+<li>Click <strong>View</strong> to see the invoice preview.</li>
+<li>Click <strong>Print</strong> to send the invoice to your printer.</li>
+<li>Click <strong>Download</strong> to save the invoice as a PDF file.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 class="section-header">14. Discount Coupons</h2>
+<p>Use this section to create promotional codes to offer discounts to your customers.</p>
+<h3>How to Create a Coupon</h3>
+<ol>
+<li>Click <strong>Discount Coupons</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Create Coupon</strong> button at the top right of the page.</li>
+<li>Enter the Coupon Code, Status, Discount Type (percentage or flat amount), Discount Value, Minimum Cart Value, Usage Limits, and Start/Expiry Dates.</li>
+<li>Click <strong>Create Coupon</strong>.</li>
+</ol>
+<h3>How to Edit a Coupon</h3>
+<ol>
+<li>Go to the <strong>Discount Coupons</strong> list page.</li>
+<li>Locate the coupon you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify the limits, dates, or values.</li>
+<li>Click <strong>Update Coupon</strong>.</li>
+</ol>
+<h3>How to Delete a Coupon</h3>
+<ol>
+<li>On the <strong>Discount Coupons</strong> list, click the <strong>Delete</strong> (trash icon) button next to the coupon.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<hr />
+<h2 class="section-header">15. Blog Manager</h2>
+<p>Use this section to write and publish articles, laundry tips, and product care guides.</p>
+<h3>How to Add a Blog Post</h3>
+<ol>
+<li>Click <strong>Blog Manager</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Add New</strong> button at the top right of the page.</li>
+<li>Enter the title, excerpt (between 20 and 500 characters), description details (minimum 50 characters) in the editor, select a category, and upload a feature cover image.</li>
+<li>Click <strong>Save Blog</strong>.</li>
+</ol>
+<h3>How to Edit a Blog Post</h3>
+<ol>
+<li>Go to the <strong>Blog Manager</strong> list page.</li>
+<li>Locate the blog you want to change and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify the title, excerpt, content, or feature image.</li>
+<li>Click <strong>Save Blog</strong>.</li>
+</ol>
+<h3>How to Delete a Blog Post</h3>
+<ol>
+<li>On the <strong>Blog Manager</strong> list, click the <strong>Delete</strong> (trash icon) button next to the blog.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<hr />
+<h2 class="section-header">16. Product Reviews</h2>
+<p>Use this section to moderate review comments submitted by storefront users on products.</p>
+<h3>How to Moderate Reviews</h3>
+<ol>
+<li>Click <strong>Product Reviews</strong> in the left sidebar menu.</li>
+<li>Review the list of customer ratings and comments.</li>
+<li>Toggle the status switch to approve (visible on website) or hide (hidden from website) a review.</li>
+</ol>
+<h3>How to Delete a Review</h3>
+<ol>
+<li>On the <strong>Product Reviews</strong> list, click the <strong>Delete</strong> (trash icon) button next to the review.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<hr />
+<h2 class="section-header">17. Contact Messages</h2>
+<p>Use this section to read and manage general queries sent from the website contact page.</p>
+<h3>How to Manage Messages</h3>
+<ol>
+<li>Click <strong>Contact Messages</strong> in the left sidebar menu.</li>
+<li>Click <strong>Mark as Read</strong> to resolve, or <strong>Mark as Unread</strong> to review later.</li>
+</ol>
+<h3>How to Delete a Message</h3>
+<ol>
+<li>On the <strong>Contact Messages</strong> list, click the <strong>Delete</strong> (trash icon) button next to the message.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<hr />
+<h2 class="section-header">18. NEXUS Enquiries</h2>
+<p>Use this section to manage enquiries relating to NEXUS certifications.</p>
+<h3>How to Manage NEXUS Enquiries</h3>
+<ol>
+<li>Click <strong>NEXUS Enquiries</strong> in the left sidebar menu.</li>
+<li>Review user details and requested certification messages.</li>
+<li>Click <strong>Mark as Read</strong> to resolve, or <strong>Mark as Unread</strong> to review later.</li>
+</ol>
+<h3>How to Delete an Enquiry</h3>
+<ol>
+<li>On the <strong>NEXUS Enquiries</strong> list, click the <strong>Delete</strong> (trash icon) button next to the enquiry.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<hr />
+<h2 class="section-header">19. Job Applications &amp; Open Positions</h2>
+<h3>How to Add a Job Position</h3>
+<ol>
+<li>Click <strong>Open Positions</strong> in the left sidebar menu.</li>
+<li>Click the <strong>Add Position</strong> button at the top right of the page.</li>
+<li>Enter the Title, Description, and requirements, and set status to active.</li>
+<li>Click <strong>Save Position</strong>.</li>
+</ol>
+<h3>How to Edit a Job Position</h3>
+<ol>
+<li>Go to the <strong>Open Positions</strong> list page.</li>
+<li>Locate the job and click the <strong>Edit</strong> (pencil icon) button.</li>
+<li>Modify the details and click <strong>Save Position</strong>.</li>
+</ol>
+<h3>How to Delete a Job Position</h3>
+<ol>
+<li>On the <strong>Open Positions</strong> list, click the <strong>Delete</strong> (trash icon) button next to the position.</li>
+<li>Confirm the delete request in the popup.</li>
+</ol>
+<h3>How to View and Manage Job Applications</h3>
+<ol>
+<li>Click <strong>Job Applications</strong> in the left sidebar menu.</li>
+<li>Review candidate names, details, and resumes.</li>
+<li>Click <strong>Mark as Read</strong> or <strong>Mark as Unread</strong>.</li>
+<li>Click the <strong>Delete</strong> button next to an application to permanently remove it.</li>
+</ol>
+
+</body>
+</html>

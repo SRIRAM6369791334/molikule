@@ -29,6 +29,7 @@ class ProductVariant extends Model
         'compare_price',
         'stock_quantity',
         'variant_image',
+        'gallery_images',
         'active',
         'is_featured',
         'is_trending',
@@ -45,7 +46,23 @@ class ProductVariant extends Model
         'is_featured' => 'boolean',
         'is_trending' => 'boolean',
         'discount_value' => 'decimal:2',
+        'gallery_images' => 'json',
     ];
+
+    public function getVariantGalleryImagesUrlsAttribute()
+    {
+        if (empty($this->gallery_images) || !is_array($this->gallery_images)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(function($img) {
+            if (!$img) return null;
+            if (str_starts_with($img, 'http') || filter_var($img, FILTER_VALIDATE_URL)) {
+                return $img;
+            }
+            return productImageUrl($img);
+        }, $this->gallery_images)));
+    }
 
     public function product()
     {

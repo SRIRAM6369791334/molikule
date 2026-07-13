@@ -51,7 +51,7 @@ class StoreProductRequest extends FormRequest
             
             // Media
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120|dimensions:width=1080,height=1080',
-            'gallery_images'   => 'nullable|array',
+            'gallery_images'   => 'nullable|array|max:4',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120|dimensions:width=1080,height=1080',
 
             // Advanced Info

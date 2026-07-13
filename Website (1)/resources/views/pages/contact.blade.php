@@ -55,7 +55,7 @@
                         <h4 style="font-weight: 800; color: #0f172a; margin-bottom: 15px;">Phone Number</h4>
                         <p style="color: #64748b; line-height: 1.7;">
                             Customer Care<br />
-                            <a href="tel:+919677828332" style="font-weight: 700; color: #0f172a;">+91 96778 28332</a> 
+                            <a href="tel:+919698066332" style="font-weight: 700; color: #0f172a;">+91 96980 66332</a> 
                         </p>
                     </div>
                 </div>

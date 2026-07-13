@@ -94,8 +94,8 @@ setInterval(createLeaf, 1400);
 for (let i = 0; i < 5; i++) setTimeout(createLeaf, i * 500);
 
 // ── COUNTDOWN ──
-// Set a fixed launch date (e.g., July 10, 2026)
-const launchDate = new Date('2026-07-10T00:00:00');
+// Set a fixed launch date for today at 12:00 PM Indian time
+const launchDate = new Date('2026-07-11T12:00:00+05:30');
 
 let prevVals = { days: -1, hours: -1, mins: -1, secs: -1 };
 

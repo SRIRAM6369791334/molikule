@@ -384,13 +384,13 @@
                         </div>
 
                         <div class="col-md-5">
-                            <div class="card premium-card mb-4 h-100">
+                            <div class="card premium-card mb-3">
                                 <div class="card-body p-4 text-center">
                                     <h6 class="card-title text-start mb-4">Variant Asset <small
                                             class="text-muted">(1080x1080)</small></h6>
                                     <div class="mb-4">
                                         <div class="position-relative d-inline-block">
-                                            <img src="{{ $variant->variant_image ?: asset('assets/images/product/img-1.png') }}"
+                                            <img src="{{ $variant->main_image }}"
                                                 class="img-thumbnail shadow-sm rounded-4" id="main-image-preview"
                                                 style="width: 220px; height: 220px; object-fit: cover;">
                                             <label for="variant_image"
@@ -402,12 +402,64 @@
                                                 accept="image/*" onchange="previewFile(event)">
                                         </div>
                                     </div>
-                                    <p class="small text-muted mb-0">Update the specific image for this variant if needed.
-                                    </p>
+                                    <p class="small text-muted mb-0">Update the specific image for this variant if needed.</p>
+                                </div>
+                            </div>
+
+                            {{-- Variant Gallery Images - directly below Variant Asset --}}
+                            <div class="card premium-card">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title mb-3">
+                                        <i class="bx bx-images me-1 text-primary"></i> Variant Gallery Images
+                                        <span class="badge bg-soft-primary text-primary ms-1" style="font-size:11px;">Max 4</span>
+                                    </h6>
+
+                                    {{-- Existing gallery images --}}
+                                    @if(!empty($variant->gallery_images) && count($variant->gallery_images) > 0)
+                                        <div class="row g-2 mb-2">
+                                            @foreach($variant->gallery_images as $img)
+                                                <div class="col-6 position-relative">
+                                                    <div class="position-relative">
+                                                        <img src="{{ asset('uploads/' . $img) }}"
+                                                            class="img-thumbnail rounded w-100"
+                                                            style="height: 80px; object-fit: cover;">
+                                                        <div class="position-absolute top-0 end-0 p-1">
+                                                            <div class="form-check bg-white rounded p-1 shadow-sm" style="opacity:0.92;">
+                                                                <input class="form-check-input text-danger"
+                                                                    type="checkbox"
+                                                                    name="delete_gallery_images[]"
+                                                                    value="{{ $img }}"
+                                                                    id="del-img-{{ $loop->index }}">
+                                                                <label class="form-check-label text-danger small fw-bold" for="del-img-{{ $loop->index }}">
+                                                                    <i class="bx bx-trash"></i>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <p class="small text-danger mb-2"><i class="bx bx-info-circle"></i> Tick trash icon to delete on save.</p>
+                                        <hr class="my-2">
+                                    @endif
+
+                                    {{-- New uploads --}}
+                                    <div id="variant-gallery-container">
+                                        <div class="mb-2">
+                                            <input type="file" class="form-control form-control-sm" name="variant_gallery[]" accept="image/*">
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm mt-1 w-100" onclick="addGalleryField()">
+                                        <i class="bx bx-plus me-1"></i> Add Another Image
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                </div>
+
+
 
                     <div class="d-flex justify-content-between mt-4">
                         <button type="button" class="btn btn-light btn-lg px-4" onclick="prevStep(2)"><i
@@ -448,6 +500,7 @@
             $('#edit-variant-form').on('submit', function (e) {
                 e.preventDefault();
                 const btn = document.getElementById('submit-btn');
+
                 btn.disabled = true;
                 btn.innerHTML = 'Saving...';
 
@@ -578,6 +631,31 @@
             n.removeAttribute('readonly');
             n.classList.add('bg-white', 'border', 'px-2');
             n.focus();
+        }
+
+        function addGalleryField() {
+            const container = document.getElementById('variant-gallery-container');
+            const existingCount = {{ !empty($variant->gallery_images) ? count($variant->gallery_images) : 0 }};
+            const newInputs = container.querySelectorAll('input[type="file"]').length;
+            const totalCount = existingCount + newInputs;
+
+            if (totalCount >= 4) {
+                Swal.fire({
+                    title: 'Maximum Reached',
+                    text: 'You can only have a maximum of 4 gallery images per variant.',
+                    icon: 'warning',
+                    confirmButtonColor: '#f46a6a'
+                });
+                return;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'mb-2 d-flex gap-2 align-items-center';
+            div.innerHTML = `
+                <input type="file" class="form-control form-control-sm" name="variant_gallery[]" accept="image/*">
+                <button type="button" class="btn btn-danger btn-sm px-2" onclick="this.parentElement.remove()"><i class="bx bx-trash"></i></button>
+            `;
+            container.appendChild(div);
         }
     </script>
 @endpush

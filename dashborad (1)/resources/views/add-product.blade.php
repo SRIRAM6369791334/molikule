@@ -287,6 +287,21 @@
                                 </div>
                             </div>
 
+                            <div class="mb-4">
+                                <label class="form-label">Product Gallery Images <span
+                                        class="dark-asterisk">*(1080x1080)</span> <span class="badge bg-soft-primary text-primary ms-1" style="font-size:11px;">Max 4</span></label>
+                                
+                                <div id="product-gallery-container">
+                                    <div class="mb-2">
+                                        <input type="file" class="form-control" name="gallery_images[]" accept="image/*" onchange="validateProductGalleryImageSize(this)">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addProductGalleryField()">
+                                    <i class="bx bx-plus me-1"></i> Add Another Image
+                                </button>
+                                <small class="text-muted d-block mt-2">Required size for each image is exactly 1080x1080 pixels.</small>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-4">
@@ -338,10 +353,7 @@
                     </div>
                 </div>
 
-                {{-- Hidden sections --}}
-                <div class="d-none">
-                    <input type="file" name="gallery_images[]" multiple>
-                </div>
+
 
                 {{-- 2. Inventory Step --}}
                 <div class="wizard-step" id="step-2">
@@ -629,6 +641,55 @@
                 };
                 reader.readAsDataURL(file);
             }
+        }
+
+        function validateProductGalleryImageSize(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function () {
+                        if (this.width !== 1080 || this.height !== 1080) {
+                            Swal.fire({
+                                title: 'Invalid Image Size',
+                                html: `Your image is <b>${this.width}x${this.height}</b>. <br>The required size is exactly <b>1080x1080</b> pixels.`,
+                                icon: 'error',
+                                confirmButtonColor: '#f46a6a'
+                            });
+                            input.value = '';
+                            $(input).addClass('is-invalid');
+                        } else {
+                            $(input).removeClass('is-invalid').addClass('is-valid');
+                        }
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addProductGalleryField() {
+            const container = document.getElementById('product-gallery-container');
+            const newInputsCount = container.querySelectorAll('input[type="file"]').length;
+
+            if (newInputsCount >= 4) {
+                Swal.fire({
+                    title: 'Maximum Reached',
+                    text: 'You can only have a maximum of 4 gallery images per product.',
+                    icon: 'warning',
+                    confirmButtonColor: '#f46a6a'
+                });
+                return;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'mb-2 d-flex gap-2 align-items-center';
+            div.innerHTML = `
+                <input type="file" class="form-control" name="gallery_images[]" accept="image/*" onchange="validateProductGalleryImageSize(this)">
+                <button type="button" class="btn btn-danger btn-sm px-2" onclick="this.parentElement.remove()"><i class="bx bx-trash"></i></button>
+            `;
+            container.appendChild(div);
         }
     </script>
 @endpush

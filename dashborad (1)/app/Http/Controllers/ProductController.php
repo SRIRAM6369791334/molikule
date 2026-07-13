@@ -201,6 +201,9 @@ class ProductController extends Controller
             // Handle Gallery Images if present
             if ($request->hasFile('gallery_images')) {
                 $gallery = [];
+                if (count($request->file('gallery_images')) > 4) {
+                    return redirect()->back()->withInput()->with('error', 'You can have a maximum of 4 gallery images per product.');
+                }
                 foreach ($request->file('gallery_images') as $file) {
                     $gallery[] = $this->processAndStoreImage($file, 'products/gallery');
                 }
@@ -239,7 +242,7 @@ class ProductController extends Controller
                 'stock_quantity' => $request->input('variant_stock', 0),
                 'discount_type' => $request->input('variant_discount_type'),
                 'discount_value' => $request->input('variant_discount_value', 0) ?: 0,
-                'variant_image' => $product->image, 
+                'variant_image' => null, 
                 'active' => true
             ]);
 
@@ -371,6 +374,9 @@ class ProductController extends Controller
         // Handle Gallery Images
         if ($request->hasFile('gallery_images')) {
             $gallery = $product->gallery_images ?? [];
+            if (count($gallery) + count($request->file('gallery_images')) > 4) {
+                return redirect()->back()->withInput()->with('error', 'You can have a maximum of 4 gallery images per product.');
+            }
             foreach ($request->file('gallery_images') as $file) {
                 $gallery[] = $this->processAndStoreImage($file, 'products/gallery');
             }
@@ -391,7 +397,9 @@ class ProductController extends Controller
                 $unit = $request->input('variant_unit');
                 $variantName = ($flavour && $unit) ? ($flavour . ' – ' . $unit) : ($flavour ?: ($unit ?: 'Standard'));
 
-                $primaryVariant->update([
+                $oldProductImage = $product->getRawOriginal('image');
+                
+                $primaryVariantData = [
                     'variant_name' => $variantName,
                     'value' => $flavour,
                     'variant_unit' => $unit,
@@ -403,7 +411,16 @@ class ProductController extends Controller
                     'active' => $product->active,
                     'is_featured' => $product->is_featured,
                     'is_trending' => $product->is_trending,
-                ]);
+                ];
+
+                // If primary variant's image matches the old product image or is empty, keep/set it as null 
+                // so it falls back to the new product image automatically.
+                $currentVariantImageRaw = $primaryVariant->getRawOriginal('variant_image');
+                if (empty($currentVariantImageRaw) || $currentVariantImageRaw === $oldProductImage) {
+                    $primaryVariantData['variant_image'] = null;
+                }
+
+                $primaryVariant->update($primaryVariantData);
 
                 // Sync main product fields for indexing/legacy support
                 $product->update([
@@ -902,5 +919,32 @@ class ProductController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Failed to store image'], 400);
+    }
+
+    public function deleteGalleryImage(Product $product, Request $request)
+    {
+        $imageToDelete = $request->input('image');
+        if (!$imageToDelete) {
+            return response()->json(['success' => false, 'message' => 'No image specified.'], 400);
+        }
+
+        $gallery = $product->gallery_images ?? [];
+        if (($key = array_search($imageToDelete, $gallery)) !== false) {
+            unset($gallery[$key]);
+            
+            // Re-index array
+            $gallery = array_values($gallery);
+            
+            $product->update(['gallery_images' => $gallery]);
+
+            // Delete file from storage
+            if (\Storage::disk('uploads')->exists($imageToDelete)) {
+                \Storage::disk('uploads')->delete($imageToDelete);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Gallery image deleted successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Image not found in gallery.'], 404);
     }
 }

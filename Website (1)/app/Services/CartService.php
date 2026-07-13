@@ -47,7 +47,7 @@ class CartService
                 'product_discount' => $productDiscount,
                 'quantity'       => $item['quantity'],
                 'row_total'      => $unitPrice * $item['quantity'],
-                'image'          => $product->image_full_url,
+                'image'          => $variant ? ($variant->variant_image_full_url ?? $product->image_full_url) : $product->image_full_url,
                 'slug'           => $product->slug,
                 'product'        => $product,
                 'variant'        => $variant

@@ -25,10 +25,10 @@ class ProductVariant extends Model
     protected $fillable = [
         'product_id', 'variant_name', 'variant_type', 'value', 'variant_unit',
         'mrp_price', 'compare_price', 'stock_quantity', 'low_stock', 'sku',
-        'variant_image', 'active', 'is_featured', 'is_trending', 'discount_type', 'discount_value',
+        'variant_image', 'gallery_images', 'active', 'is_featured', 'is_trending', 'discount_type', 'discount_value',
     ];
 
-    protected $appends = ['main_image', 'discounted_price'];
+    protected $appends = ['main_image', 'discounted_price', 'gallery_urls'];
 
 
     protected $casts = [
@@ -39,7 +39,21 @@ class ProductVariant extends Model
         'is_featured'    => 'boolean',
         'is_trending'    => 'boolean',
         'discount_value' => 'decimal:2',
+        'gallery_images' => 'json',
     ];
+
+    public function getGalleryUrlsAttribute()
+    {
+        if (empty($this->gallery_images) || !is_array($this->gallery_images)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(function($img) {
+            if (!$img) return null;
+            if (str_starts_with($img, 'http')) return $img;
+            return asset('uploads/' . $img);
+        }, $this->gallery_images)));
+    }
 
 
     protected $attributes = [

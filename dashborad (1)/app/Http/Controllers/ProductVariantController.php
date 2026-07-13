@@ -102,6 +102,18 @@ class ProductVariantController extends Controller
             $validated['variant_image'] = $this->processAndStoreImage($request->file('variant_image'), 'variants/images');
         }
 
+        // Handle variant gallery image uploads
+        if ($request->hasFile('variant_gallery')) {
+            $galleryPaths = [];
+            foreach ($request->file('variant_gallery') as $file) {
+                $path = $this->processAndStoreImage($file, 'variants/gallery');
+                if ($path) {
+                    $galleryPaths[] = $path;
+                }
+            }
+            $validated['gallery_images'] = $galleryPaths;
+        }
+
         $validated['discount_value'] = $request->input('discount_value', 0) ?: 0;
 
         ProductVariant::create($validated);
@@ -149,11 +161,34 @@ class ProductVariantController extends Controller
         // Handle image upload if present
         if ($request->hasFile('variant_image')) {
             // Delete old image
-            if ($variant->variant_image && Storage::disk('uploads')->exists($variant->variant_image)) {
-                Storage::disk('uploads')->delete($variant->variant_image);
+            $rawImage = $variant->getRawOriginal('variant_image');
+            if ($rawImage && Storage::disk('uploads')->exists($rawImage)) {
+                Storage::disk('uploads')->delete($rawImage);
             }
             $validated['variant_image'] = $this->processAndStoreImage($request->file('variant_image'), 'variants/images');
         }
+
+        // Handle variant gallery uploads and appending
+        $gallery = is_array($variant->gallery_images) ? $variant->gallery_images : [];
+        if ($request->hasFile('variant_gallery')) {
+            foreach ($request->file('variant_gallery') as $file) {
+                $path = $this->processAndStoreImage($file, 'variants/gallery');
+                if ($path) {
+                    $gallery[] = $path;
+                }
+            }
+        }
+        
+        // Handle deleting specific gallery images (if passed from form)
+        if ($request->has('delete_gallery_images')) {
+            foreach ($request->delete_gallery_images as $delImg) {
+                if (Storage::disk('uploads')->exists($delImg)) {
+                    Storage::disk('uploads')->delete($delImg);
+                }
+                $gallery = array_filter($gallery, fn($img) => $img !== $delImg);
+            }
+        }
+        $validated['gallery_images'] = array_values($gallery);
 
         $validated['active'] = $request->boolean('active', $variant->active);
         $validated['is_featured'] = $request->boolean('is_featured');
@@ -174,8 +209,18 @@ class ProductVariantController extends Controller
     {
         $variant = $product_variant;
         // Delete variant image if exists
-        if ($variant->variant_image && Storage::disk('uploads')->exists($variant->variant_image)) {
-            Storage::disk('uploads')->delete($variant->variant_image);
+        $rawImage = $variant->getRawOriginal('variant_image');
+        if ($rawImage && Storage::disk('uploads')->exists($rawImage)) {
+            Storage::disk('uploads')->delete($rawImage);
+        }
+
+        // Delete gallery images if exist
+        if (is_array($variant->gallery_images)) {
+            foreach ($variant->gallery_images as $img) {
+                if (Storage::disk('uploads')->exists($img)) {
+                    Storage::disk('uploads')->delete($img);
+                }
+            }
         }
 
         $variant->delete();
@@ -550,6 +595,18 @@ class ProductVariantController extends Controller
             $data['variant_image'] = $this->processAndStoreImage($request->file('variant_image'), 'variants/images');
         }
 
+        // Handle variant gallery uploads in AJAX
+        if ($request->hasFile('variant_gallery')) {
+            $galleryPaths = [];
+            foreach ($request->file('variant_gallery') as $file) {
+                $path = $this->processAndStoreImage($file, 'variants/gallery');
+                if ($path) {
+                    $galleryPaths[] = $path;
+                }
+            }
+            $data['gallery_images'] = $galleryPaths;
+        }
+
         $variant = ProductVariant::create($data);
 
         return response()->json([
@@ -569,11 +626,32 @@ class ProductVariantController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('variant_image')) {
-            if ($variant->variant_image && Storage::disk('uploads')->exists($variant->variant_image)) {
-                Storage::disk('uploads')->delete($variant->variant_image);
+            $rawImage = $variant->getRawOriginal('variant_image');
+            if ($rawImage && Storage::disk('uploads')->exists($rawImage)) {
+                Storage::disk('uploads')->delete($rawImage);
             }
             $data['variant_image'] = $this->processAndStoreImage($request->file('variant_image'), 'variants/images');
         }
+
+        // Handle variant gallery uploads in AJAX update
+        $gallery = is_array($variant->gallery_images) ? $variant->gallery_images : [];
+        if ($request->hasFile('variant_gallery')) {
+            foreach ($request->file('variant_gallery') as $file) {
+                $path = $this->processAndStoreImage($file, 'variants/gallery');
+                if ($path) {
+                    $gallery[] = $path;
+                }
+            }
+        }
+        if ($request->has('delete_gallery_images')) {
+            foreach ($request->delete_gallery_images as $delImg) {
+                if (Storage::disk('uploads')->exists($delImg)) {
+                    Storage::disk('uploads')->delete($delImg);
+                }
+                $gallery = array_filter($gallery, fn($img) => $img !== $delImg);
+            }
+        }
+        $data['gallery_images'] = array_values($gallery);
 
         if ($request->has('offer_price')) {
             $data['compare_price'] = $request->offer_price;
@@ -598,8 +676,18 @@ class ProductVariantController extends Controller
      */
     public function ajaxDestroy(ProductVariant $product_variant)
     {
-        if ($product_variant->variant_image && Storage::disk('uploads')->exists($product_variant->variant_image)) {
-            Storage::disk('uploads')->delete($product_variant->variant_image);
+        $rawImage = $product_variant->getRawOriginal('variant_image');
+        if ($rawImage && Storage::disk('uploads')->exists($rawImage)) {
+            Storage::disk('uploads')->delete($rawImage);
+        }
+
+        // Delete gallery images if exist
+        if (is_array($product_variant->gallery_images)) {
+            foreach ($product_variant->gallery_images as $img) {
+                if (Storage::disk('uploads')->exists($img)) {
+                    Storage::disk('uploads')->delete($img);
+                }
+            }
         }
         $product_variant->delete();
 

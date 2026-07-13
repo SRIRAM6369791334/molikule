@@ -153,7 +153,7 @@
                                     <p>Plot. No. 4, SIDCO Industrial Estate, Selliampatti ( PO ), Dharmapuri – 636 809, Tamilnadu.</p>
                                     <ul class="info mb_25 clearfix">
                                         <li><a href="mailto:mgc@molikule.com">mgc@molikule.com</a></li>
-                                        <li><a href="tel:+919677828332">+91 9677828332</a></li>
+                                        <li><a href="tel:+919698066332">+91 9698066332</a></li>
                                     </ul>
                                     <!--<ul class="social-links">-->
                                     <!--    <li><a href="#"><i class="icon-18"></i></a></li>-->

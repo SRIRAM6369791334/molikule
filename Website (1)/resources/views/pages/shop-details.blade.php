@@ -2,6 +2,27 @@
 
 @section('content')
 
+@php
+    $thumbs = [];
+    if (!empty($product->image_full_url)) {
+        $thumbs[] = $product->image_full_url;
+    }
+    if (!empty($product->gallery_images) && is_array($product->gallery_images)) {
+        foreach ($product->gallery_images as $galImg) {
+            $thumbs[] = productImageUrl($galImg);
+        }
+    }
+    if ($product->variants) {
+        foreach ($product->variants as $variant) {
+            $variantUrl = $variant->variant_image_full_url;
+            if ($variantUrl && !in_array($variantUrl, $thumbs)) {
+                $thumbs[] = $variantUrl;
+            }
+        }
+    }
+    $thumbs = array_slice(array_values(array_unique($thumbs)), 0, 4);
+@endphp
+
 {{-- ═══════════════════════ PAGE TITLE ═══════════════════════ --}}
 <section class="pd-hero">
     <div class="auto-container">
@@ -33,6 +54,15 @@
                         </a>
                     </figure>
                     <div class="pd-image-decor"></div>
+                </div>
+
+                {{-- ── THUMBNAILS ── --}}
+                <div class="pd-thumbs-wrap {{ count($thumbs) <= 1 ? 'd-none' : '' }}" id="product-thumbnails-container">
+                    @foreach($thumbs as $thumb)
+                        <div class="pd-thumb-item {{ $loop->first ? 'active' : '' }}" onclick="changeProductImage('{{ $thumb }}', this)">
+                            <img src="{{ $thumb }}" alt="Thumbnail">
+                        </div>
+                    @endforeach
                 </div>
 
                 {{-- ── TABS MOVED UNDER IMAGE ── --}}
@@ -258,6 +288,7 @@
                                 const hiddenInput    = document.getElementById('resolved-variant-id');
                                 const stockBadge     = document.getElementById('variant-stock-badge');
                                 const skuDisplay     = document.getElementById('pd-spec-sku');
+                                const defaultThumbsHtml = document.getElementById('product-thumbnails-container') ? document.getElementById('product-thumbnails-container').innerHTML : '';
 
                                 function resolveVariant() {
                                     const selected = {};
@@ -333,11 +364,74 @@
                                             priceDisplay.innerHTML = html;
                                         }
 
-                                        // Update Image
-                                        if (match.image && productImage) {
-                                            productImage.src = match.image;
-                                            const link = productImage.closest('.lightbox-image');
-                                            if (link) link.href = match.image;
+                                        // Update Image & Thumbnails
+                                        const thumbsContainer = document.getElementById('product-thumbnails-container');
+                                        if (productImage) {
+                                            const variantGallery = (match.gallery && match.gallery.length > 0) ? match.gallery : (match.image ? [match.image] : []);
+                                            
+                                            if (variantGallery.length > 0) {
+                                                // Case B: Variant has custom gallery/image. Show only variant's thumbnails!
+                                                const firstImage = variantGallery[0];
+                                                productImage.src = firstImage;
+                                                const link = productImage.closest('.lightbox-image');
+                                                if (link) link.href = firstImage;
+
+                                                if (thumbsContainer) {
+                                                    let galleryHtml = '';
+                                                    variantGallery.forEach((imgUrl, index) => {
+                                                        galleryHtml += `
+                                                            <div class="pd-thumb-item ${index === 0 ? 'active' : ''}" onclick="changeProductImage('${imgUrl}', this)">
+                                                                <img src="${imgUrl}" alt="Variant Thumbnail">
+                                                            </div>
+                                                        `;
+                                                    });
+                                                    thumbsContainer.innerHTML = galleryHtml;
+                                                    
+                                                    // Limit gallery thumbs to maximum of 4
+                                                    const galleryThumbs = thumbsContainer.querySelectorAll('.pd-thumb-item');
+                                                    if (galleryThumbs.length > 4) {
+                                                        for (let i = 4; i < galleryThumbs.length; i++) {
+                                                            galleryThumbs[i].style.display = 'none';
+                                                        }
+                                                    }
+                                                    
+                                                    // If count is <= 1, hide container, else show it
+                                                    if (variantGallery.length <= 1) {
+                                                        thumbsContainer.classList.add('d-none');
+                                                    } else {
+                                                        thumbsContainer.classList.remove('d-none');
+                                                    }
+                                                }
+                                            } else {
+                                                // Case A: Variant has NO custom image/gallery. Restore product's default thumbnails!
+                                                if (thumbsContainer) {
+                                                    thumbsContainer.innerHTML = defaultThumbsHtml;
+                                                    
+                                                    // If default thumbs count was <= 1, hide container, else show it
+                                                    const hasMultipleThumbs = {{ count($thumbs) > 1 ? 'true' : 'false' }};
+                                                    if (hasMultipleThumbs) {
+                                                        thumbsContainer.classList.remove('d-none');
+                                                    } else {
+                                                        thumbsContainer.classList.add('d-none');
+                                                    }
+                                                    
+                                                    // Highlight the first default thumbnail (the main product image)
+                                                    const firstThumb = thumbsContainer.querySelector('.pd-thumb-item');
+                                                    if (firstThumb) {
+                                                        firstThumb.classList.add('active');
+                                                        const firstThumbImg = firstThumb.querySelector('img');
+                                                        if (firstThumbImg) {
+                                                            productImage.src = firstThumbImg.src;
+                                                            const link = productImage.closest('.lightbox-image');
+                                                            if (link) link.href = firstThumbImg.src;
+                                                        }
+                                                    }
+                                                } else {
+                                                    productImage.src = "{{ $product->image_full_url }}";
+                                                    const link = productImage.closest('.lightbox-image');
+                                                    if (link) link.href = "{{ $product->image_full_url }}";
+                                                }
+                                            }
                                         }
 
                                         // Update Stock
@@ -591,6 +685,50 @@ body.internal-page span {
     box-shadow: var(--shadow-lg);
     border: 1px solid rgba(255,255,255,0.8);
     overflow: hidden;
+}
+
+/* ── PRODUCT THUMBNAILS GALLERY ── */
+.pd-thumbs-wrap {
+    display: flex;
+    gap: 14px;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+.pd-thumb-item {
+    width: 82px;
+    height: 82px;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    padding: 8px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+.pd-thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+.pd-thumb-item:hover {
+    border-color: var(--brand);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+.pd-thumb-item:hover img {
+    transform: scale(1.06);
+}
+.pd-thumb-item.active {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--brand), var(--shadow-md);
 }
 .pd-image-decor {
     position: absolute;
@@ -1152,10 +1290,17 @@ body.internal-page span {
     /* Strip the wrapper so its children join the flex context */
     .pd-image-col { display: contents; }
     
-    /* Force the new visual order: Image -> Info -> Tabs */
+    /* Force the new visual order: Image -> Thumbs -> Info -> Tabs */
     .pd-image-wrap { order: 1; padding: 32px; width: 100%; }
-    .pd-info-col { order: 2; width: 100%; }
-    .pd-tabs-wrap { order: 3; width: 100%; margin-top: 0 !important; }
+    .pd-thumbs-wrap { 
+        order: 2; 
+        width: 100%; 
+        justify-content: center; 
+        margin-top: 15px; 
+        margin-bottom: 15px; 
+    }
+    .pd-info-col { order: 3; width: 100%; }
+    .pd-tabs-wrap { order: 4; width: 100%; margin-top: 0 !important; }
 
     .pd-product-img { height: 300px; }
     .pd-info-card { padding: 32px; }
@@ -1207,6 +1352,20 @@ body.internal-page span {
         });
     });
 })();
+
+function changeProductImage(src, element) {
+    const productImage = document.getElementById('main-product-image');
+    if (productImage) {
+        productImage.src = src;
+        const link = productImage.closest('.lightbox-image');
+        if (link) link.href = src;
+    }
+    
+    // Highlight selected thumbnail
+    const thumbs = document.querySelectorAll('.pd-thumb-item');
+    thumbs.forEach(thumb => thumb.classList.remove('active'));
+    if (element) element.classList.add('active');
+}
 
 function adjustQty(delta) {
     const input = document.getElementById('pd-qty');
